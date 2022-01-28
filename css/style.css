@@ -1,0 +1,13 @@
+.jimu-widget-reviewerwidget>* {
+    margin-bottom: 10px;
+}
+
+.jimu-widget-reviewerwidget label {
+    display: inline-block;
+    min-width: 80px;
+    margin-right: 10px;
+}
+
+.jimu-widget-reviewerwidget .dijitSelect {
+    width: 250px;
+  }
