@@ -1,11 +1,33 @@
 <div>
     <div>
-        <label>Select Taxa</label>
+        <label><b>Select Taxa</b></label>
         <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="taxaSelect"></select>
     </div>
     <div>
-        <label>Select Species</label>
+        <label><b>Select Species</b></label>
         <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="speciesSelect"></select>
     </div>
-    <div data-dojo-attach-point="ResultNode1"></div>
+    <div>
+        <span><b>Range Version:</b></span>
+        <span data-dojo-attach-point='rangeVersion'></span>
+    </div>
+    <div>
+        <span><b>Stage:</b></span>
+        <span data-dojo-attach-point='rangeStage'></span>
+    </div>
+    <div>
+        <span><b>Range Map Scope:</b></span>
+        <span data-dojo-attach-point='rangeScope'></span>
+    </div>
+    <div>
+        <span><b>Species Information:</b></span>
+        <span data-dojo-attach-point='speciesInformation'></span>
+    </div>
+    <div>
+        <span><b>Metadata:</b></span>
+        <span data-dojo-attach-point='rangeMetadata'></span>
+    </div>
+    <div><span data-dojo-attach-point='rangeMapNotes'></span></div>
+
+    <div data-dojo-attach-point="messageNode"></div>
 </div>
