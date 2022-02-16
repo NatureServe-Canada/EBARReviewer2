@@ -110,7 +110,7 @@ define([
                 this._onSearchFinish
             );
 
-            on(dom.byId('backButton'), "click", function(e) {
+            on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("div2").style.display = "none";
                 dom.byId("div1").style.display = "block";
             });
@@ -141,6 +141,71 @@ define([
 
             let div2 = dom.byId("div2");
             div2.style.display = "block";
+
+            // this._queryLayer(
+            //     "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11",
+            //     "objectid = " + data.selectionInfo.ReviewerApp2_9712[0],
+            //     ["ecoshapeid", "markup"],
+            // )
+
+            if (Array.isArray(data.selectionInfo.ReviewerApp2_2465) && data.selectionInfo.ReviewerApp2_2465.length != 0) {
+                this._queryLayer(
+                    "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
+                    "ecoshapeid = " + data.selectionInfo.ReviewerApp2_2465[0],
+                    ["presence"],
+                    this._populateDropdown
+                )
+            }
+            else if (Array.isArray(data.selectionInfo.ReviewerApp2_3112) && data.selectionInfo.ReviewerApp2_3112.length != 0) {
+                let values = ["Present", "Presence Expected", "Historical"];
+                let options = [];
+                for (let i = 0; i < values.length; i++) {
+                    options.push({
+                        label: values[i],
+                        value: values[i]
+                    });
+                }
+
+                this.markupSelect.set('options', options);
+            }
+
+        },
+
+        _populateDropdown: function (results) {
+            // for (let i = 0; i < results.features.length; i++) {
+            //     let featureAttributes = results.features[i].attributes;
+            //     for (let attr in featureAttributes) {
+
+            //     }
+            // }
+
+            let feature = results.features[0].attributes;
+            let presence = feature['presence'];
+            console.log(presence);
+
+            let values = null
+            if (presence === 'P') {
+                values = ["Presence Expected", "Historical", "Remove"];
+            }
+            else if (presence === 'H') {
+                values = ["Present", "Presence Expected", "Remove"];
+            }
+            else {
+                values = ["Present", "Historical", "Remove"];
+            }
+
+            let options = [];
+            for (let i = 0; i < values.length; i++) {
+                options.push({
+                    label: values[i],
+                    value: values[i]
+                });
+            }
+
+            this.markupSelect.set('options', options);
+            // for (let attr in featureAttributes) {
+
+            // }
         },
 
         _setDiv2: function (ecoshapeId) {
@@ -152,15 +217,15 @@ define([
             )
         },
 
-        _setDiv2Results: function(results) {
+        _setDiv2Results: function (results) {
             // console.log(results);
-            for (let i =0; i < results.features.length; i++) {
+            for (let i = 0; i < results.features.length; i++) {
                 let featureAttributes = results.features[i].attributes;
                 for (let attr in featureAttributes) {
                     dom.byId(attr).innerHTML = featureAttributes[attr];
                     // if (attr == 'ecoshapeid') console.log(featureAttributes[attr])
                 }
-                
+
             }
             dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
         },
