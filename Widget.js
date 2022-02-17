@@ -15,7 +15,6 @@
 ///////////////////////////////////////////////////////////////////////////
 define([
     'dojo/_base/declare',
-    'dojo/_base/array',
     'jimu/BaseWidget',
     'dijit/_WidgetsInTemplateMixin',
     'dojo/_base/lang',
@@ -23,12 +22,10 @@ define([
     'esri/tasks/query',
     'esri/tasks/QueryTask',
     'dojo/dom',
-    'dojo/dom-construct',
     'dojo/on',
-    "esri/layers/FeatureLayer",
     'dojo/domReady!'
-], function (declare, array, BaseWidget, _WidgetsInTemplateMixin,
-    lang, LayerStructure, Query, QueryTask, dom, domConstruct, on, FeatureLayer) {
+], function (declare, BaseWidget, _WidgetsInTemplateMixin,
+    lang, LayerStructure, Query, QueryTask, dom, on) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
@@ -49,79 +46,6 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            // const foundLayer = this.map.allLayers.find(function (layer) {
-            //     return layer.title === "US Counties";
-            // });
-
-            // console.log(foundLayer);
-
-            // var layers = this.map.getLayersVisibleAtScale(this.map.getScale());
-            // array.forEach(layers, function (layer) {
-            //     console.log(layer.id)
-            //     if (layer.id == 'ReviewerApp2_2465') {
-            //         console.info(layer.className)
-            //         layer.setDefinitionExpression("rangemapid=471");
-            //         layer.refresh();
-            //     }
-            // });
-            let layer = this.map.getLayer("ReviewerApp2_2465");;
-            console.log(layer.id);
-            // console.log(this.map)
-
-            // const foundTable = this.map.allTables.find(function(table) {
-            //     // Find a table with title "US Counties"
-            //     return table.title === "ReviewerApp2 - ReviewRangeMapSpecies";
-            //   });
-
-            // let speciesRangeEchoshape = null;
-
-            // for (const key in this.map._layers) {
-            //     // console.log(`${key}: ${this.map._layers[key]._name}`);
-            //     if (this.map._layers[key]._name === 'ReviewerApp2 - Species Range Ecoshapes (generalized)') {
-            //         // console.log(this.map._layers[key])
-            //         speciesRangeEchoshape = this.map._layers[key]
-            //     }
-            // }
-            // console.log(typeof this.map._layers)
-            // console.log(speciesRangeEchoshape)
-            // console.log(this.map)
-
-
-            // var layerStructure = LayerStructure.getInstance();
-            // console.log(layerStructure.getBasemapLayerObjects())
-            // function printLayerTree() {
-            //     layerStructure.traversal(function (layerNode) {
-            //         if (layerNode.title == "ReviewerApp2 - ReviewRangeMapSpecies") {
-            //             // console.log(layerNode.title);
-            //             // console.log("*******************")
-            //             // layerNode.getLayerType().then((resolvedVal) => {console.log(resolvedVal)})
-            //             // console.log("*******************")
-            //             // layerNode.getLayerObject().then((resolvedVal) => {console.log(resolvedVal)})
-            //             // console.log("*****************");
-            //             // console.log(layerNode)
-            //             // console.log(layerNode.isLabelVisble())
-            //             // console.log(layerNode.isTable());
-
-            //             let layer;
-            //             layerNode.getLayerObject().then((resolvedVal) => {layer = resolvedVal});
-            //             // console.log(layer)
-            //             layer.definitionExpression = "username = 'pvkommareddi'"
-            //             // let query = layer.createQuery()
-            //             // query.where = "Username = 'pvkommareddi'";
-            //             // query.outFields = ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"];
-
-            //             // layer.queryFeatures(query1).then(function (response) {
-            //             //     let resultCount = response.features.length;
-            //             //     console.log(resultCount);
-            //             // });
-            //         }
-            //         //   var indent = "";
-            //         //   for(var i = 0; i < layerNode.getNodeLevel(); i++) {indent += "  ";}
-            //         //   console.log(indent, layerNode.title);
-            //         //   console.log(typeof layerNode)
-            //     });
-            // }
-
             // printLayerTree();
 
             this._queryLayer(
@@ -135,8 +59,6 @@ define([
                 dom.byId("div2").style.display = "none";
                 dom.byId("div1").style.display = "block";
             });
-
-            on()
 
             // this.fetchDataByName('Select');
         },
@@ -158,8 +80,6 @@ define([
             let div1 = dom.byId("div1");
             div1.style.display = "none";
 
-            // console.log(data);
-            // console.log(data.selectionInfo.ReviewerApp2_3112[0]);
             this._setDiv2(data.selectionInfo.ReviewerApp2_3112[0]);
 
             let div2 = dom.byId("div2");
@@ -195,16 +115,8 @@ define([
         },
 
         _populateDropdown: function (results) {
-            // for (let i = 0; i < results.features.length; i++) {
-            //     let featureAttributes = results.features[i].attributes;
-            //     for (let attr in featureAttributes) {
-
-            //     }
-            // }
-
             let feature = results.features[0].attributes;
             let presence = feature['presence'];
-            // console.log(presence);
 
             let values = null
             if (presence === 'P') {
@@ -226,9 +138,6 @@ define([
             }
 
             this.markupSelect.set('options', options);
-            // for (let attr in featureAttributes) {
-
-            // }
         },
 
         _setDiv2: function (ecoshapeId) {
@@ -309,22 +218,20 @@ define([
                     }
                 }
 
-                let speciesRangeEcoshapes = this.map.getLayer("ReviewerApp2_2465");
-                speciesRangeEcoshapes.setDefinitionExpression("rangemapid=" + rangeMapID);
-                speciesRangeEcoshapes.refresh();
+                let layerStructure = LayerStructure.getInstance();
+                layerStructure.traversal(function (layerNode) {
+                    if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)" ||
+                        layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
+                        layerNode.getLayerObject().then((layer) => {
+                            layer.setDefinitionExpression("rangemapid=" + rangeMapID);
+                            layer.refresh();
+                        });
+                    }
+                });
 
-                let reviewedEcoshapes = this.map.getLayer("ReviewerApp2_9712");
-                reviewedEcoshapes.setDefinitionExpression("rangemapid=" + rangeMapID);
-                reviewedEcoshapes.refresh();
-
-                // console.log(layer.id);
             }));
 
         },
-
-        // _queryFeatureLayer: function () {
-
-        // },
 
         _onSearchError: function (error) {
             console.error(error);
