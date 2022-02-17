@@ -25,8 +25,10 @@ define([
     'dojo/dom',
     'dojo/dom-construct',
     'dojo/on',
+    "esri/layers/FeatureLayer",
     'dojo/domReady!'
-], function (declare, array, BaseWidget, _WidgetsInTemplateMixin, lang, LayerStructure, Query, QueryTask, dom, domConstruct, on) {
+], function (declare, array, BaseWidget, _WidgetsInTemplateMixin,
+    lang, LayerStructure, Query, QueryTask, dom, domConstruct, on, FeatureLayer) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
@@ -46,6 +48,25 @@ define([
 
         startup: function () {
             this.inherited(arguments);
+
+            // const foundLayer = this.map.allLayers.find(function (layer) {
+            //     return layer.title === "US Counties";
+            // });
+
+            // console.log(foundLayer);
+
+            // var layers = this.map.getLayersVisibleAtScale(this.map.getScale());
+            // array.forEach(layers, function (layer) {
+            //     console.log(layer.id)
+            //     if (layer.id == 'ReviewerApp2_2465') {
+            //         console.info(layer.className)
+            //         layer.setDefinitionExpression("rangemapid=471");
+            //         layer.refresh();
+            //     }
+            // });
+            let layer = this.map.getLayer("ReviewerApp2_2465");;
+            console.log(layer.id);
+            // console.log(this.map)
 
             // const foundTable = this.map.allTables.find(function(table) {
             //     // Find a table with title "US Counties"
@@ -115,6 +136,8 @@ define([
                 dom.byId("div1").style.display = "block";
             });
 
+            on()
+
             // this.fetchDataByName('Select');
         },
         _queryLayer: function (url, where, outFields, method) {
@@ -135,8 +158,8 @@ define([
             let div1 = dom.byId("div1");
             div1.style.display = "none";
 
-            console.log(data);
-            console.log(data.selectionInfo.ReviewerApp2_3112[0]);
+            // console.log(data);
+            // console.log(data.selectionInfo.ReviewerApp2_3112[0]);
             this._setDiv2(data.selectionInfo.ReviewerApp2_3112[0]);
 
             let div2 = dom.byId("div2");
@@ -181,7 +204,7 @@ define([
 
             let feature = results.features[0].attributes;
             let presence = feature['presence'];
-            console.log(presence);
+            // console.log(presence);
 
             let values = null
             if (presence === 'P') {
@@ -269,6 +292,8 @@ define([
                 this.speciesSelect.set('options', suboptions);
             }));
 
+            let rangeMapID = null;
+
             this.speciesSelect.on('change', lang.hitch(this, function (val) {
                 for (var i = 0; i < results.features.length; i++) {
                     var featureAttributes = results.features[i].attributes;
@@ -279,10 +304,27 @@ define([
                         this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
                         this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
                         this.speciesInformation.innerHTML = '<a href="https://explorer.natureserve.org/Search#q">go to NatureServe Explorer</a>';
+
+                        rangeMapID = featureAttributes['rangemapid'];
                     }
                 }
+
+                let speciesRangeEcoshapes = this.map.getLayer("ReviewerApp2_2465");
+                speciesRangeEcoshapes.setDefinitionExpression("rangemapid=" + rangeMapID);
+                speciesRangeEcoshapes.refresh();
+
+                let reviewedEcoshapes = this.map.getLayer("ReviewerApp2_9712");
+                reviewedEcoshapes.setDefinitionExpression("rangemapid=" + rangeMapID);
+                reviewedEcoshapes.refresh();
+
+                // console.log(layer.id);
             }));
+
         },
+
+        // _queryFeatureLayer: function () {
+
+        // },
 
         _onSearchError: function (error) {
             console.error(error);
