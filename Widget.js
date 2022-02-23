@@ -46,15 +46,6 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            // printLayerTree();
-
-            this._queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
-                "Username = 'pvkommareddi'",
-                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"],
-                this._onSearchFinish
-            );
-
             on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("div2").style.display = "none";
                 dom.byId("div1").style.display = "block";
@@ -62,6 +53,7 @@ define([
 
             // this.fetchDataByName('Select');
         },
+
         _queryLayer: function (url, where, outFields, method) {
             var queryParams = new Query();
             queryParams.returnGeometry = false;
@@ -150,7 +142,6 @@ define([
         },
 
         _setDiv2Results: function (results) {
-            // console.log(results);
             for (let i = 0; i < results.features.length; i++) {
                 let featureAttributes = results.features[i].attributes;
                 for (let attr in featureAttributes) {
@@ -202,6 +193,7 @@ define([
             }));
 
             let rangeMapID = null;
+            let reviewID = null;
 
             this.speciesSelect.on('change', lang.hitch(this, function (val) {
                 for (var i = 0; i < results.features.length; i++) {
@@ -215,16 +207,20 @@ define([
                         this.speciesInformation.innerHTML = '<a href="https://explorer.natureserve.org/Search#q">go to NatureServe Explorer</a>';
 
                         rangeMapID = featureAttributes['rangemapid'];
+                        reviewID = featureAttributes['reviewid'];
                     }
                 }
 
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(function (layerNode) {
-                    if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)" ||
-                        layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
+                    if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)") {
                         layerNode.getLayerObject().then((layer) => {
                             layer.setDefinitionExpression("rangemapid=" + rangeMapID);
-                            layer.refresh();
+                        });
+                    }
+                    else if(layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
+                        layerNode.getLayerObject().then((layer) => {
+                            layer.setDefinitionExpression("reviewid=" + reviewID);
                         });
                     }
                 });
@@ -235,7 +231,7 @@ define([
 
         _onSearchError: function (error) {
             console.error(error);
-        }
+        },
 
         // onOpen: function(){
         //   console.log('onOpen');
@@ -253,10 +249,19 @@ define([
         //   console.log('onMaximize');
         // },
 
-        // onSignIn: function(credential){
-        //   /* jshint unused:false*/
-        //   console.log('onSignIn');
-        // },
+        onSignIn: function (credential) {
+            /* jshint unused:false*/
+            console.log('onSignIn');
+            
+            this._queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
+                `Username = '${credential.userId}'`,
+                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"],
+                this._onSearchFinish
+            );
+
+            this.userCredentials = credential;
+        },
 
         // onSignOut: function(){
         //   console.log('onSignOut');
