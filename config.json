@@ -1,0 +1,7 @@
+{
+    "layers": {
+        "ECOSHAPES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+        "REVIEWED_ECOSHAPES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11",
+        "SPECIES_RANGE_ECOSHAPES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10"
+    }
+}

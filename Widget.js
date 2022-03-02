@@ -57,14 +57,14 @@ define([
             this.speciesRangeEcoshapesDict = {}
 
             this._queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+                this.config.layers.ECOSHAPES,
                 "1=1",
                 ["objectid", "ecoshapeid"],
                 this._idMapping1
             );
 
             this._queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+                this.config.layers.REVIEWED_ECOSHAPES,
                 "1=1",
                 ["objectid", "ecoshapeid"],
                 this._idMapping2
@@ -165,17 +165,26 @@ define([
             let presence = feature['presence'];
 
             let values = null
-            let valueLabel = null
             if (presence === 'P') {
-                values = [{ label: "Presence Expected", value: "X" },
-                { label: "Historical", value: "H" },
-                { label: "Remove", value: "R" }];
+                values = [
+                    { label: "Presence Expected", value: "X" },
+                    { label: "Historical", value: "H" },
+                    { label: "Remove", value: "R" }
+                ];
             }
             else if (presence === 'H') {
-                values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Remove", value: "R" }];
+                values = [
+                    { label: "Present", value: "P" },
+                    { label: "Presence Expected", value: "X" },
+                    { label: "Remove", value: "R" }
+                ];
             }
             else {
-                values = [{ label: "Present", value: "P" }, { label: "Historical", value: "H" }, { label: "Remove", value: "R" }];
+                values = [
+                    { label: "Present", value: "P" },
+                    { label: "Historical", value: "H" },
+                    { label: "Remove", value: "R" }
+                ];
             }
 
             let options = [];
