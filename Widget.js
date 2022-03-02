@@ -23,13 +23,11 @@ define([
     'esri/tasks/QueryTask',
     'dojo/dom',
     'dojo/on',
-    'dojo/request/xhr',
-    'esri/request',
     'esri/layers/FeatureLayer',
     'esri/graphic',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin,
-    lang, LayerStructure, Query, QueryTask, dom, on, xhr, esriRequest, FeatureLayer, graphic) {
+    lang, LayerStructure, Query, QueryTask, dom, on, FeatureLayer, graphic) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
@@ -55,36 +53,42 @@ define([
                 dom.byId("div1").style.display = "block";
             });
 
-            // let inputjson = {
-            //     features: {
-            //         attributes: {
-            //             reviewid: 1896,
-            //             ecoshapeid: 126,
-            //             ecoshapereviewnotes: "test",
-            //             username: "pvkommareddi",
-            //             markup: "Present"
-            //         },
-            //         rollbackOnFailure: "false",
-            //         f: "json",
-            //         token: this.userCredentials.token
-            //     }
-            // }
-            // inputjson = JSON.stringify(inputjson);
+            this.echoshapesDict = {}
+            this.speciesRangeEcoshapesDict = {}
 
-            let ecochapeReviewLayer = new FeatureLayer("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3");
+            this._queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+                "1=1",
+                ["objectid", "ecoshapeid"],
+                this._idMapping1
+            );
 
-            let graphicObj = new graphic();
-            graphicObj.setAttributes({
-                reviewid: 1896,
-                ecoshapeid: 126,
-                ecoshapereviewnotes: "test",
-                Username: "pvkommareddi",
-                Markup: "P"
-            });
+            this._queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+                "1=1",
+                ["objectid", "ecoshapeid"],
+                this._idMapping2
+            );
 
-            ecochapeReviewLayer.applyEdits([graphicObj]);
+            // this.map.on("click", function(mouseEvent) {
+            //     console.log(mouseEvent);
+            //     console.log(this.infoWindow)
+            // });
 
             // this.fetchDataByName('Select');
+        },
+
+        _idMapping1: function (results) {
+            for (let i = 0; i < results.features.length; i++) {
+                let featureAttributes = results.features[i].attributes;
+                this.echoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+            }
+        },
+        _idMapping2: function (results) {
+            for (let i = 0; i < results.features.length; i++) {
+                let featureAttributes = results.features[i].attributes;
+                this.speciesRangeEcoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+            }
         },
 
         _queryLayer: function (url, where, outFields, method) {
@@ -101,12 +105,13 @@ define([
             if (name !== 'Select') {
                 return;
             }
+            // console.log(this.map.infoWindow)
+            console.log(data.selectionInfo)
 
             let div1 = dom.byId("div1");
             div1.style.display = "none";
 
             this._setDiv2(data.selectionInfo.ReviewerApp2_3112[0]);
-            // console.log(data.selectionInfo.ReviewerApp2_3112[0]);
 
             let div2 = dom.byId("div2");
             div2.style.display = "block";
@@ -138,67 +143,21 @@ define([
                 this.markupSelect.set('options', options);
             }
 
-            // const bodyFormData = new FormData();
-            // bodyFormData.append("features", {
-            //     "attributes": {
-            //         "reviewid": 1896,
-            //         "ecoshapeid": 126,
-            //         "ecoshapereviewnotes": "test",
-            //         "username": "xyz",
-            //         "markup": "Present"
-            //     }
-            // });
-            // bodyFormData.append("rollbackOnFailure", false);
-            // bodyFormData.append("f", "pjson");
-            // bodyFormData.append("token", this.userCredentials.token);
-
-            // var object = {};
-            // bodyFormData.forEach(function (value, key) {
-            //     object[key] = value;
-            // });
-            // var inputjson = JSON.stringify(object);
-            // let inputjson = {
-            //     features: {
-            //         attributes: {
-            //             reviewid: 1896,
-            //             ecoshapeid: 126,
-            //             ecoshapereviewnotes: "test",
-            //             username: "pvkommareddi",
-            //             markup: "Present"
-            //         },
-            //         rollbackOnFailure: "false",
-            //         f: "json",
-            //         token: this.userCredentials.token
-            //     }
-            // }
-            // inputjson = JSON.stringify(inputjson);
-
-            // var dfd = esriRequest({
-            //     url: "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3/addFeatures",
-            //     content: inputjson,
-            //     handleAs: "text"
-            //     // form: document.getElementById("formDiv")
-            // }, {
-            //     returnProgress: true,
-            //     usePost: true
-            // });
-            // dfd.then(function (result) {
-            //     console.log(result);
-            // }, null, function (update) {
-            //     console.log("progress", update);
-            // }).catch(function (err) {
-            //     console.log(err);
-            // });
 
 
-            // xhr("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3/addFeatures", {
-            //     data: bodyFormData,
-            //     method: "POST"
-            // }).then(function (data) {
-            //     console.log(data);
-            // }, function (err) {
-            //     console.log(err);
+            // let ecochapeReviewLayer = new FeatureLayer("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3");
+
+            // let graphicObj = new graphic();
+            // graphicObj.setAttributes({
+            //     reviewid: 1896,
+            //     ecoshapeid: 126,
+            //     ecoshapereviewnotes: "test",
+            //     Username: "pvkommareddi",
+            //     Markup: "P"
             // });
+
+            // ecochapeReviewLayer.applyEdits([graphicObj]);
+
         },
 
         _populateDropdown: function (results) {
@@ -206,6 +165,7 @@ define([
             let presence = feature['presence'];
 
             let values = null
+            let valueLabel = null
             if (presence === 'P') {
                 values = ["Presence Expected", "Historical", "Remove"];
             }
@@ -354,7 +314,6 @@ define([
                 ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"],
                 this._onSearchFinish
             );
-            console.log(credential)
 
             this.userCredentials = credential;
         },
