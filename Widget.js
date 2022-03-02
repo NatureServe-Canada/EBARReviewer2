@@ -131,12 +131,12 @@ define([
                 )
             }
             else if (Array.isArray(data.selectionInfo.ReviewerApp2_3112) && data.selectionInfo.ReviewerApp2_3112.length != 0) {
-                let values = ["Present", "Presence Expected", "Historical"];
+                let values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Historical", value: "H" }];
                 let options = [];
                 for (let i = 0; i < values.length; i++) {
                     options.push({
-                        label: values[i],
-                        value: values[i]
+                        label: values[i]['label'],
+                        value: values[i]['value']
                     });
                 }
 
@@ -167,20 +167,22 @@ define([
             let values = null
             let valueLabel = null
             if (presence === 'P') {
-                values = ["Presence Expected", "Historical", "Remove"];
+                values = [{ label: "Presence Expected", value: "X" },
+                { label: "Historical", value: "H" },
+                { label: "Remove", value: "R" }];
             }
             else if (presence === 'H') {
-                values = ["Present", "Presence Expected", "Remove"];
+                values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Remove", value: "R" }];
             }
             else {
-                values = ["Present", "Historical", "Remove"];
+                values = [{ label: "Present", value: "P" }, { label: "Historical", value: "H" }, { label: "Remove", value: "R" }];
             }
 
             let options = [];
             for (let i = 0; i < values.length; i++) {
                 options.push({
-                    label: values[i],
-                    value: values[i]
+                    label: values[i]['label'],
+                    value: values[i]['value']
                 });
             }
 
