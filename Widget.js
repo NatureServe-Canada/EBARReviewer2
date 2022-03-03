@@ -25,9 +25,11 @@ define([
     'dojo/on',
     'esri/layers/FeatureLayer',
     'esri/graphic',
+    './Helper',
+    './DataModel',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin,
-    lang, LayerStructure, Query, QueryTask, dom, on, FeatureLayer, graphic) {
+    lang, LayerStructure, Query, QueryTask, dom, on, FeatureLayer, graphic, Helper, DataModel) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
@@ -48,47 +50,65 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            on(dom.byId('backButton'), "click", function (e) {
-                dom.byId("div2").style.display = "none";
-                dom.byId("div1").style.display = "block";
-            });
+            this.dataModel = new DataModel();
 
-            this.echoshapesDict = {}
-            this.speciesRangeEcoshapesDict = {}
+            // [
+            //     { dictObj: this.echoshapesDict, url: this.config.layers.ECOSHAPES },
+            //     { dictObj: this.speciesRangeEcoshapesDict, url: this.speciesRangeEcoshapesDict }
+            // ].forEach(function (item) {
+            //     var queryParams = new Query();
+            //     queryParams.returnGeometry = false;
+            //     queryParams.where = "1=1";
+            //     queryParams.outFields = ["objectid", "ecoshapeid"];
+            //     var queryTask = new QueryTask(item['url']);
+            //     queryTask.execute(queryParams, lang.hitch(this, function (results) {
+            //         for (let i = 0; i < results.features.length; i++) {
+            //             let featureAttributes = results.features[i].attributes;
+            //             item['dictObj'][featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+            //         }
+            //     }), lang.hitch(this, this._onSearchError));
+            // });
 
             this._queryLayer(
                 this.config.layers.ECOSHAPES,
                 "1=1",
                 ["objectid", "ecoshapeid"],
-                this._idMapping1
+                function (results) {
+                    for (let i = 0; i < results.features.length; i++) {
+                        let featureAttributes = results.features[i].attributes;
+                        this.dataModel.echoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+                    }
+                }
             );
 
             this._queryLayer(
                 this.config.layers.REVIEWED_ECOSHAPES,
                 "1=1",
                 ["objectid", "ecoshapeid"],
-                this._idMapping2
+                function (results) {
+                    for (let i = 0; i < results.features.length; i++) {
+                        let featureAttributes = results.features[i].attributes;
+                        this.dataModel.speciesRangeEcoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+                    }
+                }
             );
 
+            console.log(this.dataModel.echoshapesDict);
+
+            on(dom.byId('backButton'), "click", function (e) {
+                dom.byId("markupPanel").style.display = "none";
+                dom.byId("infoPanel").style.display = "block";
+            });
+
+            on(dom.byId('saveButton'), "click", function (e) {
+
+            });
             // this.map.on("click", function(mouseEvent) {
             //     console.log(mouseEvent);
             //     console.log(this.infoWindow)
             // });
 
             // this.fetchDataByName('Select');
-        },
-
-        _idMapping1: function (results) {
-            for (let i = 0; i < results.features.length; i++) {
-                let featureAttributes = results.features[i].attributes;
-                this.echoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
-            }
-        },
-        _idMapping2: function (results) {
-            for (let i = 0; i < results.features.length; i++) {
-                let featureAttributes = results.features[i].attributes;
-                this.speciesRangeEcoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
-            }
         },
 
         _queryLayer: function (url, where, outFields, method) {
@@ -105,44 +125,16 @@ define([
             if (name !== 'Select') {
                 return;
             }
-            // console.log(this.map.infoWindow)
-            console.log(data.selectionInfo)
 
-            let div1 = dom.byId("div1");
-            div1.style.display = "none";
+            let infoPanel = dom.byId("infoPanel");
+            infoPanel.style.display = "none";
 
             this._setDiv2(data.selectionInfo.ReviewerApp2_3112[0]);
 
-            let div2 = dom.byId("div2");
-            div2.style.display = "block";
+            let markupPanel = dom.byId("markupPanel");
+            markupPanel.style.display = "block";
 
-            // this._queryLayer(
-            //     "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11",
-            //     "objectid = " + data.selectionInfo.ReviewerApp2_9712[0],
-            //     ["ecoshapeid", "markup"],
-            // )
-
-            if (Array.isArray(data.selectionInfo.ReviewerApp2_2465) && data.selectionInfo.ReviewerApp2_2465.length != 0) {
-                this._queryLayer(
-                    "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
-                    "ecoshapeid = " + data.selectionInfo.ReviewerApp2_2465[0],
-                    ["presence"],
-                    this._populateDropdown
-                )
-            }
-            else if (Array.isArray(data.selectionInfo.ReviewerApp2_3112) && data.selectionInfo.ReviewerApp2_3112.length != 0) {
-                let values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Historical", value: "H" }];
-                let options = [];
-                for (let i = 0; i < values.length; i++) {
-                    options.push({
-                        label: values[i]['label'],
-                        value: values[i]['value']
-                    });
-                }
-
-                this.markupSelect.set('options', options);
-            }
-
+            new Helper().setMarkupOptions(data, this.markupSelect);
 
 
             // let ecochapeReviewLayer = new FeatureLayer("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3");
@@ -160,63 +152,22 @@ define([
 
         },
 
-        _populateDropdown: function (results) {
-            let feature = results.features[0].attributes;
-            let presence = feature['presence'];
-
-            let values = null
-            if (presence === 'P') {
-                values = [
-                    { label: "Presence Expected", value: "X" },
-                    { label: "Historical", value: "H" },
-                    { label: "Remove", value: "R" }
-                ];
-            }
-            else if (presence === 'H') {
-                values = [
-                    { label: "Present", value: "P" },
-                    { label: "Presence Expected", value: "X" },
-                    { label: "Remove", value: "R" }
-                ];
-            }
-            else {
-                values = [
-                    { label: "Present", value: "P" },
-                    { label: "Historical", value: "H" },
-                    { label: "Remove", value: "R" }
-                ];
-            }
-
-            let options = [];
-            for (let i = 0; i < values.length; i++) {
-                options.push({
-                    label: values[i]['label'],
-                    value: values[i]['value']
-                });
-            }
-
-            this.markupSelect.set('options', options);
-        },
-
         _setDiv2: function (ecoshapeId) {
             this._queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
                 "InPoly_FID = " + ecoshapeId,
-                ["ParentEcoregion", "Ecozone", "TerrestrialArea", "EcoshapeName", "ecoshapeid"],
-                this._setDiv2Results
-            )
-        },
+                ["ParentEcoregion", "Ecozone", "TerrestrialArea", "EcoshapeName"],
+                function (results) {
+                    for (let i = 0; i < results.features.length; i++) {
+                        let featureAttributes = results.features[i].attributes;
+                        for (let attr in featureAttributes) {
+                            dom.byId(attr).innerHTML = featureAttributes[attr];
+                        }
 
-        _setDiv2Results: function (results) {
-            for (let i = 0; i < results.features.length; i++) {
-                let featureAttributes = results.features[i].attributes;
-                for (let attr in featureAttributes) {
-                    dom.byId(attr).innerHTML = featureAttributes[attr];
-                    // if (attr == 'ecoshapeid') console.log(featureAttributes[attr])
+                    }
+                    dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
                 }
-
-            }
-            dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
+            )
         },
 
 

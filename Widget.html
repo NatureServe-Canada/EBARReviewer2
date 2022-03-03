@@ -1,5 +1,5 @@
 <div>
-    <div id="div1">
+    <div id="infoPanel">
         <div>
             <label><b>Select Taxa</b></label>
             <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="taxaSelect"></select>
@@ -32,8 +32,8 @@
 
         <div data-dojo-attach-point="messageNode"></div>
     </div>
-    <div id="div2" style="display: none">
-        <button class="esri-button" id="backButton">Back</button>
+    <div id="markupPanel" style="display: none">
+        <!-- <button class="esri-button" id="backButton">Back</button> -->
         <h1>Ecoshape: <span id="ecoshapename"></span></h1>
         <hr>
         <div id="meta-data">
@@ -76,6 +76,12 @@
             <div>
                 <label for="reference">Reference:</label><br>
                 <input type="text" name="reference" id="reference" data-dojo-type="dijit/form/TextBox" />
+            </div>
+            <div>
+                <span>
+                    <button class="esri-button" id="backButton">Back</button>
+                    <button class="esri-button" id="saveButton">Save</button>
+                </span>
             </div>
         </div>
     </div>
