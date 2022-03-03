@@ -129,7 +129,7 @@ define([
             let infoPanel = dom.byId("infoPanel");
             infoPanel.style.display = "none";
 
-            this._setDiv2(data.selectionInfo.ReviewerApp2_3112[0]);
+            new Helper().setEcoshapeInfo(data.selectionInfo.ReviewerApp2_3112[0]);
 
             let markupPanel = dom.byId("markupPanel");
             markupPanel.style.display = "block";
@@ -151,25 +151,6 @@ define([
             // ecochapeReviewLayer.applyEdits([graphicObj]);
 
         },
-
-        _setDiv2: function (ecoshapeId) {
-            this._queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
-                "InPoly_FID = " + ecoshapeId,
-                ["ParentEcoregion", "Ecozone", "TerrestrialArea", "EcoshapeName"],
-                function (results) {
-                    for (let i = 0; i < results.features.length; i++) {
-                        let featureAttributes = results.features[i].attributes;
-                        for (let attr in featureAttributes) {
-                            dom.byId(attr).innerHTML = featureAttributes[attr];
-                        }
-
-                    }
-                    dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
-                }
-            )
-        },
-
 
         _onSearchFinish: function (results) {
             var layerData = [];

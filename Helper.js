@@ -1,9 +1,10 @@
 define([
     'dojo/_base/lang',
     'dojo/_base/declare',
+    'dojo/dom',
     'esri/tasks/query',
     'esri/tasks/QueryTask'
-], function (lang, declare, Query, QueryTask) {
+], function (lang, declare, dom, Query, QueryTask) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method) {
             var queryParams = new Query();
@@ -70,6 +71,26 @@ define([
 
                 markupList.set('options', options);
             }
+        },
+        setEcoshapeInfo: function (ecoshapeId) {
+            this.queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
+                "InPoly_FID = " + ecoshapeId,
+                ["ParentEcoregion", "Ecozone", "TerrestrialArea", "EcoshapeName"],
+                function (results) {
+                    for (let i = 0; i < results.features.length; i++) {
+                        let featureAttributes = results.features[i].attributes;
+                        for (let attr in featureAttributes) {
+                            dom.byId(attr).innerHTML = featureAttributes[attr];
+                        }
+
+                    }
+                    dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
+                }
+            )
+        },
+        _onSearchError: function (error) {
+            console.error(error);
         },
     });
 });
