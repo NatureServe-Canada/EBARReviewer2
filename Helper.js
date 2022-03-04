@@ -90,7 +90,7 @@ define([
                 }
             )
         },
-        setUserTaxaSpecies: function(username, widgetObj) {
+        setUserTaxaSpecies: function (username, widgetObj) {
             this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
                 `Username = '${username}'`,
@@ -170,7 +170,19 @@ define([
                 });
             }));
         },
-
+        mapReviewEcoshapeIDs: function (url, dict) {
+            this.queryLayer(
+                url,
+                "1=1",
+                ["objectid", "ecoshapeid"],
+                lang.hitch(dict, function (results) {
+                    for (let i = 0; i < results.features.length; i++) {
+                        let featureAttributes = results.features[i].attributes;
+                        this[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
+                    }
+                })
+            );
+        },
         _onSearchError: function (error) {
             console.error(error);
         },

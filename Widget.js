@@ -17,10 +17,6 @@ define([
     'dojo/_base/declare',
     'jimu/BaseWidget',
     'dijit/_WidgetsInTemplateMixin',
-    'dojo/_base/lang',
-    'jimu/LayerStructure',
-    'esri/tasks/query',
-    'esri/tasks/QueryTask',
     'dojo/dom',
     'dojo/on',
     'esri/layers/FeatureLayer',
@@ -29,7 +25,7 @@ define([
     './DataModel',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin,
-    lang, LayerStructure, Query, QueryTask, dom, on, FeatureLayer, graphic, Helper, DataModel) {
+    dom, on, FeatureLayer, graphic, Helper, DataModel) {
     //To create a widget, you need to derive from BaseWidget.
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
@@ -52,48 +48,8 @@ define([
 
             this.dataModel = new DataModel();
 
-            // [
-            //     { dictObj: this.echoshapesDict, url: this.config.layers.ECOSHAPES },
-            //     { dictObj: this.speciesRangeEcoshapesDict, url: this.speciesRangeEcoshapesDict }
-            // ].forEach(function (item) {
-            //     var queryParams = new Query();
-            //     queryParams.returnGeometry = false;
-            //     queryParams.where = "1=1";
-            //     queryParams.outFields = ["objectid", "ecoshapeid"];
-            //     var queryTask = new QueryTask(item['url']);
-            //     queryTask.execute(queryParams, lang.hitch(this, function (results) {
-            //         for (let i = 0; i < results.features.length; i++) {
-            //             let featureAttributes = results.features[i].attributes;
-            //             item['dictObj'][featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
-            //         }
-            //     }), lang.hitch(this, this._onSearchError));
-            // });
-
-            this._queryLayer(
-                this.config.layers.ECOSHAPES,
-                "1=1",
-                ["objectid", "ecoshapeid"],
-                function (results) {
-                    for (let i = 0; i < results.features.length; i++) {
-                        let featureAttributes = results.features[i].attributes;
-                        this.dataModel.echoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
-                    }
-                }
-            );
-
-            this._queryLayer(
-                this.config.layers.REVIEWED_ECOSHAPES,
-                "1=1",
-                ["objectid", "ecoshapeid"],
-                function (results) {
-                    for (let i = 0; i < results.features.length; i++) {
-                        let featureAttributes = results.features[i].attributes;
-                        this.dataModel.speciesRangeEcoshapesDict[featureAttributes['objectid']] = featureAttributes['ecoshapeid'];
-                    }
-                }
-            );
-
-            console.log(this.dataModel.echoshapesDict);
+            new Helper().mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES, this.dataModel.echoshapesDict);
+            new Helper().mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
             on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("markupPanel").style.display = "none";
@@ -103,21 +59,8 @@ define([
             on(dom.byId('saveButton'), "click", function (e) {
 
             });
-            // this.map.on("click", function(mouseEvent) {
-            //     console.log(mouseEvent);
-            //     console.log(this.infoWindow)
-            // });
 
             // this.fetchDataByName('Select');
-        },
-
-        _queryLayer: function (url, where, outFields, method) {
-            var queryParams = new Query();
-            queryParams.returnGeometry = false;
-            queryParams.where = where;
-            queryParams.outFields = outFields;
-            var queryTask = new QueryTask(url);
-            queryTask.execute(queryParams, lang.hitch(this, method), lang.hitch(this, this._onSearchError));
         },
 
         onReceiveData: function (name, widgetId, data, historyData) {
@@ -136,7 +79,6 @@ define([
 
             new Helper().setMarkupOptions(data, this.markupSelect);
 
-
             // let ecochapeReviewLayer = new FeatureLayer("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3");
 
             // let graphicObj = new graphic();
@@ -150,10 +92,6 @@ define([
 
             // ecochapeReviewLayer.applyEdits([graphicObj]);
 
-        },
-
-        _onSearchError: function (error) {
-            console.error(error);
         },
 
         // onOpen: function(){
