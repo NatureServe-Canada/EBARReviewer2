@@ -3,8 +3,9 @@ define([
     'dojo/_base/declare',
     'dojo/dom',
     'esri/tasks/query',
-    'esri/tasks/QueryTask'
-], function (lang, declare, dom, Query, QueryTask) {
+    'esri/tasks/QueryTask',
+    'jimu/LayerStructure',
+], function (lang, declare, dom, Query, QueryTask, LayerStructure) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method) {
             var queryParams = new Query();
@@ -12,7 +13,7 @@ define([
             queryParams.where = where;
             queryParams.outFields = outFields;
             var queryTask = new QueryTask(url);
-            queryTask.execute(queryParams, lang.hitch(this, method), lang.hitch(this, this._onSearchError));
+            queryTask.execute(queryParams, method, lang.hitch(this, this._onSearchError));
         },
         setMarkupOptions: function (data, markupList) {
             if (Array.isArray(data.selectionInfo.ReviewerApp2_2465) && data.selectionInfo.ReviewerApp2_2465.length != 0) {
@@ -72,7 +73,7 @@ define([
                 markupList.set('options', options);
             }
         },
-        setEcoshapeInfo: function (ecoshapeId) {
+        setEcoshapeInfo: function (ecoshapeId, ecoshapeSpecies) {
             this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
                 "InPoly_FID = " + ecoshapeId,
@@ -85,10 +86,91 @@ define([
                         }
 
                     }
-                    dom.byId("ecoshapeSpecies").innerHTML = this.taxaSelect.value;
+                    dom.byId("ecoshapeSpecies").innerHTML = ecoshapeSpecies;
                 }
             )
         },
+        setUserTaxaSpecies: function(username, widgetObj) {
+            this.queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
+                `Username = '${username}'`,
+                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"],
+                lang.hitch(widgetObj, this._setSpeciesDropdown)
+            );
+        },
+        _setSpeciesDropdown: function (results) {
+            var layerData = [];
+            for (var i = 0; i < results.features.length; i++) {
+                var featureAttributes = results.features[i].attributes;
+                let obj = {};
+                for (var attr in featureAttributes) {
+                    obj[attr] = featureAttributes[attr];
+                }
+                layerData.push(obj);
+            }
+
+            let taxGroups = new Set();
+            layerData.forEach((record) => taxGroups.add(record['tax_group']));
+
+            let taxGroupOptions = [];
+            taxGroups.forEach((val) => {
+                taxGroupOptions.push({
+                    label: val,
+                    value: val
+                });
+            });
+
+            this.taxaSelect.set('options', taxGroupOptions);
+            this.taxaSelect.on('change', lang.hitch(this, function (val) {
+                let suboptions = [];
+                for (let i = 0; i < layerData.length; i++) {
+                    if (layerData[i]['tax_group'] == val) {
+                        suboptions.push({
+                            label: layerData[i]['national_scientific_name'],
+                            value: layerData[i]['national_scientific_name']
+                        });
+                    }
+                }
+                this.speciesSelect.reset();
+                // suboptions[0]['selected'] = true;
+                this.speciesSelect.set('options', suboptions);
+            }));
+
+            let rangeMapID = null;
+            let reviewID = null;
+
+            this.speciesSelect.on('change', lang.hitch(this, function (val) {
+                for (var i = 0; i < results.features.length; i++) {
+                    var featureAttributes = results.features[i].attributes;
+                    if (featureAttributes['national_scientific_name'] == val) {
+                        this.rangeVersion.innerHTML = featureAttributes['rangeversion'];
+                        this.rangeStage.innerHTML = featureAttributes['rangestage'];
+                        this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
+                        this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
+                        this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
+                        this.speciesInformation.innerHTML = '<a href="https://explorer.natureserve.org/Search#q">go to NatureServe Explorer</a>';
+
+                        rangeMapID = featureAttributes['rangemapid'];
+                        reviewID = featureAttributes['reviewid'];
+                    }
+                }
+
+                let layerStructure = LayerStructure.getInstance();
+                layerStructure.traversal(function (layerNode) {
+                    if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)") {
+                        layerNode.getLayerObject().then((layer) => {
+                            layer.setDefinitionExpression("rangemapid=" + rangeMapID);
+                        });
+                    }
+                    else if (layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
+                        layerNode.getLayerObject().then((layer) => {
+                            layer.setDefinitionExpression("reviewid=" + reviewID);
+                        });
+                    }
+                });
+            }));
+        },
+
         _onSearchError: function (error) {
             console.error(error);
         },
