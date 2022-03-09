@@ -17,6 +17,7 @@ define([
     'dojo/_base/declare',
     'jimu/BaseWidget',
     'dijit/_WidgetsInTemplateMixin',
+    'dojo/_base/lang',
     'dojo/dom',
     'dojo/on',
     'esri/layers/FeatureLayer',
@@ -24,9 +25,10 @@ define([
     './Helper',
     './DataModel',
     'dojo/domReady!'
-], function (declare, BaseWidget, _WidgetsInTemplateMixin,
+], function (declare, BaseWidget, _WidgetsInTemplateMixin, lang,
     dom, on, FeatureLayer, graphic, Helper, DataModel) {
     //To create a widget, you need to derive from BaseWidget.
+    var helper = new Helper();
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
         // Custom widget code goes here
 
@@ -48,17 +50,52 @@ define([
 
             this.dataModel = new DataModel();
 
-            new Helper().mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES, this.dataModel.echoshapesDict);
-            new Helper().mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
+            // var helper = new Helper();
+
+            helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES, this.dataModel.echoshapesDict);
+            helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
             on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
             });
 
-            on(dom.byId('saveButton'), "click", function (e) {
+            on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
+                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
+                let ecoshapeID = this.dataModel.echoshapesDict[this.dataModel.ReviewerApp2_3112[0]];
 
-            });
+                if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
+                    helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
+                        .then((objectID) => {
+                            let graphicObj = new graphic();
+                            graphicObj.setAttributes({
+                                objectid: objectID,
+                                reviewid: this.dataModel.reviewID,
+                                ecoshapeid: ecoshapeID,
+                                ecoshapereviewnotes: dom.byId("comment").value,
+                                Username: "pvkommareddi",
+                                Markup: this.markupSelect.value
+                            });
+                            ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                                new helper.refreshMapLayer("ReviewerApp2 - Species Range Ecoshapes (generalized)")
+                            });
+                        });
+                }
+                else {
+                    let graphicObj = new graphic();
+                    graphicObj.setAttributes({
+                        reviewid: this.dataModel.reviewID,
+                        ecoshapeid: ecoshapeID,
+                        ecoshapereviewnotes: dom.byId("comment").value,
+                        Username: "pvkommareddi",
+                        Markup: this.markupSelect.value
+                    });
+
+                    ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
+                        helper.refreshMapLayer("ReviewerApp2 - Species Range Ecoshapes (generalized)")
+                    });
+                }
+            }));
 
             // this.fetchDataByName('Select');
         },
@@ -68,6 +105,9 @@ define([
             if (name !== 'Select') {
                 return;
             }
+            this.dataModel.ReviewerApp2_9712 = data.selectionInfo.ReviewerApp2_9712;
+            this.dataModel.ReviewerApp2_3112 = data.selectionInfo.ReviewerApp2_3112;
+            this.dataModel.ReviewerApp2_2465 = data.selectionInfo.ReviewerApp2_2465;
 
             let infoPanel = dom.byId("infoPanel");
             infoPanel.style.display = "none";
@@ -78,20 +118,6 @@ define([
             markupPanel.style.display = "block";
 
             new Helper().setMarkupOptions(data, this.markupSelect);
-
-            // let ecochapeReviewLayer = new FeatureLayer("https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3");
-
-            // let graphicObj = new graphic();
-            // graphicObj.setAttributes({
-            //     reviewid: 1896,
-            //     ecoshapeid: 126,
-            //     ecoshapereviewnotes: "test",
-            //     Username: "pvkommareddi",
-            //     Markup: "P"
-            // });
-
-            // ecochapeReviewLayer.applyEdits([graphicObj]);
-
         },
 
         // onOpen: function(){

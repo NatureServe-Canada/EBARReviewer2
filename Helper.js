@@ -13,7 +13,7 @@ define([
             queryParams.where = where;
             queryParams.outFields = outFields;
             var queryTask = new QueryTask(url);
-            queryTask.execute(queryParams, method, lang.hitch(this, this._onSearchError));
+            return queryTask.execute(queryParams, method, lang.hitch(this, this._onSearchError));
         },
         setMarkupOptions: function (data, markupList) {
             if (Array.isArray(data.selectionInfo.ReviewerApp2_2465) && data.selectionInfo.ReviewerApp2_2465.length != 0) {
@@ -155,6 +155,8 @@ define([
                     }
                 }
 
+                this.dataModel.reviewID = reviewID;
+
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(function (layerNode) {
                     if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)") {
@@ -182,6 +184,29 @@ define([
                     }
                 })
             );
+        },
+
+        refreshMapLayer: function (title) {
+            let layerStructure = LayerStructure.getInstance();
+            layerStructure.traversal(function (layerNode) {
+                if (layerNode.title === title) {
+                    layerNode.getLayerObject().then((layer) => {
+                        layer.refresh();
+                    });
+                }
+            });
+        },
+
+        getObjectID: function (url, reviewID, ecoshapeID) {
+            return this.queryLayer(
+                url,
+                "reviewid=" + reviewID + " and ecoshapeid=" + ecoshapeID,
+                ["objectid"],
+                null
+            ).then((results) => {
+                let featureAttributes = results.features[0].attributes;
+                return featureAttributes['objectid'];
+            });
         },
         _onSearchError: function (error) {
             console.error(error);
