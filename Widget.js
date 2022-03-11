@@ -50,8 +50,6 @@ define([
 
             this.dataModel = new DataModel();
 
-            // var helper = new Helper();
-
             helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES, this.dataModel.echoshapesDict);
             helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
@@ -73,11 +71,11 @@ define([
                                 reviewid: this.dataModel.reviewID,
                                 ecoshapeid: ecoshapeID,
                                 ecoshapereviewnotes: dom.byId("comment").value,
-                                Username: "pvkommareddi",
+                                Username:  this.userCredentials.userId,
                                 Markup: this.markupSelect.value
                             });
                             ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                new helper.refreshMapLayer("ReviewerApp2 - Species Range Ecoshapes (generalized)")
+                                new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
                             });
                         });
                 }
@@ -87,12 +85,12 @@ define([
                         reviewid: this.dataModel.reviewID,
                         ecoshapeid: ecoshapeID,
                         ecoshapereviewnotes: dom.byId("comment").value,
-                        Username: "pvkommareddi",
+                        Username: this.userCredentials.userId,
                         Markup: this.markupSelect.value
                     });
 
                     ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
-                        helper.refreshMapLayer("ReviewerApp2 - Species Range Ecoshapes (generalized)")
+                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
                     });
                 }
             }));
