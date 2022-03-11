@@ -66,11 +66,14 @@ define([
                     reviewid: this.dataModel.reviewID,
                     ecoshapeid: ecoshapeID,
                     ecoshapereviewnotes: dom.byId("comment").value,
-                    Username: this.userCredentials.userId,
-                    Markup: this.markupSelect.value
+                    username: this.userCredentials.userId,
+                    markup: this.markupSelect.value
                 };
                 if (dom.byId("reference").value) {
                     attributes.reference = dom.byId("reference").value;
+                }
+                if(this.markupSelect.value === 'R' && this.removalReason.value) {
+                    attributes.removalreason = this.removalReason.value;
                 }
 
                 if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
@@ -79,6 +82,7 @@ define([
                             attributes.objectid = objectID;
                             let graphicObj = new graphic();
                             graphicObj.setAttributes(attributes);
+
                             ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
                                 new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
                             });
