@@ -62,18 +62,23 @@ define([
                 let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
                 let ecoshapeID = this.dataModel.echoshapesDict[this.dataModel.ReviewerApp2_3112[0]];
 
+                let attributes = {
+                    reviewid: this.dataModel.reviewID,
+                    ecoshapeid: ecoshapeID,
+                    ecoshapereviewnotes: dom.byId("comment").value,
+                    Username: this.userCredentials.userId,
+                    Markup: this.markupSelect.value
+                };
+                if (dom.byId("reference").value) {
+                    attributes.reference = dom.byId("reference").value;
+                }
+
                 if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
                     helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
                         .then((objectID) => {
+                            attributes.objectid = objectID;
                             let graphicObj = new graphic();
-                            graphicObj.setAttributes({
-                                objectid: objectID,
-                                reviewid: this.dataModel.reviewID,
-                                ecoshapeid: ecoshapeID,
-                                ecoshapereviewnotes: dom.byId("comment").value,
-                                Username:  this.userCredentials.userId,
-                                Markup: this.markupSelect.value
-                            });
+                            graphicObj.setAttributes(attributes);
                             ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
                                 new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
                             });
@@ -81,13 +86,7 @@ define([
                 }
                 else {
                     let graphicObj = new graphic();
-                    graphicObj.setAttributes({
-                        reviewid: this.dataModel.reviewID,
-                        ecoshapeid: ecoshapeID,
-                        ecoshapereviewnotes: dom.byId("comment").value,
-                        Username: this.userCredentials.userId,
-                        Markup: this.markupSelect.value
-                    });
+                    graphicObj.setAttributes(attributes);
 
                     ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
                         helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
@@ -107,15 +106,14 @@ define([
             this.dataModel.ReviewerApp2_3112 = data.selectionInfo.ReviewerApp2_3112;
             this.dataModel.ReviewerApp2_2465 = data.selectionInfo.ReviewerApp2_2465;
 
-            let infoPanel = dom.byId("infoPanel");
-            infoPanel.style.display = "none";
+            dom.byId("infoPanel").style.display = "none";
 
-            new Helper().setEcoshapeInfo(data.selectionInfo.ReviewerApp2_3112[0], this.speciesSelect.value);
+            helper.setEcoshapeInfo(data.selectionInfo.ReviewerApp2_3112[0], this.speciesSelect.value);
 
-            let markupPanel = dom.byId("markupPanel");
-            markupPanel.style.display = "block";
+            dom.byId("removalReasonDiv").style.display = "none";
+            dom.byId("markupPanel").style.display = "block";
 
-            new Helper().setMarkupOptions(data, this.markupSelect);
+            helper.setMarkupOptions(data, this.markupSelect);
         },
 
         // onOpen: function(){

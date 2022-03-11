@@ -69,6 +69,16 @@
                 <span>Markup (required):</span>
                 <select data-dojo-type="dijit/form/Select" data-dojo-attach-point="markupSelect"></select>
             </div>
+            <div id='removalReasonDiv' style="display:none">
+                <label for="comment">Removal Reason (required):</label><br>
+                <select data-dojo-type="dijit/form/Select" name="removalReason">
+                    <option value="F">Reported But False</option>
+                    <option value="N">Never Was There</option>
+                    <option value="O">Other</option>
+                    <option value="T">Transient/Vagrant</option>
+                    <option value="P">Presumed Extirpated</option>
+                </select>
+            </div>
             <div>
                 <label for="comment">Comment (required):</label><br>
                 <input type="text" name="comment" id="comment" data-dojo-type="dijit/form/TextBox" />

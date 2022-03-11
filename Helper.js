@@ -72,6 +72,15 @@ define([
 
                 markupList.set('options', options);
             }
+            markupList.on('change', lang.hitch(this, function (val) {
+                let removalReasonDiv = dom.byId("removalReasonDiv");
+                if (val === 'R') {
+                    removalReasonDiv.style.display = "block";
+                }
+                else {
+                    removalReasonDiv.style.display = "none";
+                }
+            }));
         },
         setEcoshapeInfo: function (ecoshapeId, ecoshapeSpecies) {
             this.queryLayer(
