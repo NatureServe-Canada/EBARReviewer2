@@ -58,6 +58,26 @@ define([
                 dom.byId("infoPanel").style.display = "block";
             });
 
+            on(dom.byId('deleteMarkup'), "click", lang.hitch(this, function (e) {
+                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
+                let ecoshapeID = this.dataModel.echoshapesDict[this.dataModel.ReviewerApp2_3112[0]];
+
+                if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
+                    helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
+                        .then((objectID) => {
+                            let graphicObj = new graphic();
+                            graphicObj.setAttributes({
+                                objectid: objectID
+                            });
+
+                            ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
+                                new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
+                            });
+                        });
+                }
+            }));
+
+
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
                 let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
                 let ecoshapeID = this.dataModel.echoshapesDict[this.dataModel.ReviewerApp2_3112[0]];
@@ -72,7 +92,7 @@ define([
                 if (dom.byId("reference").value) {
                     attributes.reference = dom.byId("reference").value;
                 }
-                if(this.markupSelect.value === 'R' && this.removalReason.value) {
+                if (this.markupSelect.value === 'R' && this.removalReason.value) {
                     attributes.removalreason = this.removalReason.value;
                 }
 
@@ -109,6 +129,11 @@ define([
             this.dataModel.ReviewerApp2_9712 = data.selectionInfo.ReviewerApp2_9712;
             this.dataModel.ReviewerApp2_3112 = data.selectionInfo.ReviewerApp2_3112;
             this.dataModel.ReviewerApp2_2465 = data.selectionInfo.ReviewerApp2_2465;
+
+            dom.byId("deleteMarkupSpan").style.display = "none";
+            if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
+                dom.byId("deleteMarkupSpan").style.display = "inline-block";
+            }
 
             dom.byId("infoPanel").style.display = "none";
 
