@@ -24,9 +24,10 @@ define([
     'esri/graphic',
     './Helper',
     './DataModel',
+    'jimu/LayerStructure',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin, lang,
-    dom, on, FeatureLayer, graphic, Helper, DataModel) {
+    dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure) {
     //To create a widget, you need to derive from BaseWidget.
     var helper = new Helper();
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
@@ -50,7 +51,7 @@ define([
 
             this.dataModel = new DataModel();
 
-            helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES, this.dataModel.echoshapesDict);
+            helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES.URL, this.dataModel.echoshapesDict);
             helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
             on(dom.byId('backButton'), "click", function (e) {
@@ -104,7 +105,7 @@ define([
                             graphicObj.setAttributes(attributes);
 
                             ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
+                                helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
                             });
                         });
                 }
@@ -113,7 +114,7 @@ define([
                     graphicObj.setAttributes(attributes);
 
                     ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
-                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
+                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
                     });
                 }
             }));
