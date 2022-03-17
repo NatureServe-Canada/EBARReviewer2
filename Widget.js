@@ -117,6 +117,34 @@ define([
                     attributes.removalreason = this.removalReason.value;
                 }
 
+                helper.queryLayer(
+                    this.config.layers.REVIEWED_ECOSHAPES,
+                    "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID,
+                    ['objectid'],
+                    lang.hitch(this, function (results) {
+                        if (Array.isArray(results.features) && results.features.length != 0) {
+                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
+                                .then((objectID) => {
+                                    attributes.objectid = objectID;
+                                    let graphicObj = new graphic();
+                                    graphicObj.setAttributes(attributes);
+
+                                    ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
+                                    });
+                                });
+                        }
+                        else {
+                            let graphicObj = new graphic();
+                            graphicObj.setAttributes(attributes);
+
+                            ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
+                                helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
+                            });
+                        }
+                    })
+                );
+                return;
                 if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
                     helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
                         .then((objectID) => {
