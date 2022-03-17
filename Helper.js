@@ -15,7 +15,72 @@ define([
             var queryTask = new QueryTask(url);
             return queryTask.execute(queryParams, method, lang.hitch(this, this._onSearchError));
         },
-        setMarkupOptions: function (data, markupList) {
+        setMarkupOptions: function (data, markupList, parentObj) {
+            this.queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
+                "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
+                ['presence'],
+                function (results) {
+                    if (Array.isArray(results.features) && results.features.length != 0) {
+                        let presence = results.features[0].attributes['presence'];
+
+                        let values = null
+                        if (presence === 'P') {
+                            values = [
+                                { label: "Presence Expected", value: "X" },
+                                { label: "Historical", value: "H" },
+                                { label: "Remove", value: "R" }
+                            ];
+                        }
+                        else if (presence === 'H') {
+                            values = [
+                                { label: "Present", value: "P" },
+                                { label: "Presence Expected", value: "X" },
+                                { label: "Remove", value: "R" }
+                            ];
+                        }
+                        else {
+                            values = [
+                                { label: "Present", value: "P" },
+                                { label: "Historical", value: "H" },
+                                { label: "Remove", value: "R" }
+                            ];
+                        }
+
+                        let options = [];
+                        for (let i = 0; i < values.length; i++) {
+                            options.push({
+                                label: values[i]['label'],
+                                value: values[i]['value']
+                            });
+                        }
+
+                        markupList.set('options', options);
+                    }
+                    else {
+                        let values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Historical", value: "H" }];
+                        let options = [];
+                        for (let i = 0; i < values.length; i++) {
+                            options.push({
+                                label: values[i]['label'],
+                                value: values[i]['value']
+                            });
+                        }
+
+                        markupList.set('options', options);
+                    }
+                    markupList.on('change', lang.hitch(this, function (val) {
+                        let removalReasonDiv = dom.byId("removalReasonDiv");
+                        if (val === 'R') {
+                            removalReasonDiv.style.display = "block";
+                        }
+                        else {
+                            removalReasonDiv.style.display = "none";
+                        }
+                    }));
+                }
+            )
+            return;
             if (Array.isArray(data.selectionInfo.ReviewerApp2_2465) && data.selectionInfo.ReviewerApp2_2465.length != 0) {
                 this.queryLayer(
                     "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
@@ -85,7 +150,7 @@ define([
         setEcoshapeInfo: function (ecoshapeId, ecoshapeSpecies) {
             this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
-                "InPoly_FID = " + ecoshapeId,
+                "ecoshapeid=" + ecoshapeId,
                 ["ParentEcoregion", "Ecozone", "TerrestrialArea", "EcoshapeName"],
                 function (results) {
                     for (let i = 0; i < results.features.length; i++) {
@@ -165,6 +230,7 @@ define([
                 }
 
                 this.dataModel.reviewID = reviewID;
+                this.dataModel.rangeMapID = rangeMapID;
 
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(lang.hitch(this, function (layerNode) {

@@ -125,6 +125,7 @@ define([
                 if (layerNode.title === "ReviewerApp2 - Ecoshapes (generalized)") {
                     layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                         layer.on("selection-complete", lang.hitch(this, function (val) {
+                            // console.log(val);
                             if (val.method === FeatureLayer.SELECTION_NEW) {
                                 this.selectedFeatures = [val.features[0].attributes];
                             }
@@ -141,16 +142,37 @@ define([
                                 else
                                     this.selectedFeatures = [val.features[0].attributes];
                             }
-                            else if(val.method === FeatureLayer.SELECTION_SUBTRACT) {
-                                if(this.selectedFeatures) {
+                            else if (val.method === FeatureLayer.SELECTION_SUBTRACT) {
+                                if (this.selectedFeatures) {
                                     for (let i = 0; i < this.selectedFeatures.length; i++) {
                                         if (this.selectedFeatures[i].objectid === val.features[0].attributes.objectid)
-                                            this.selectedFeatures.splice(i,1);
+                                            this.selectedFeatures.splice(i, 1);
                                     }
                                 }
                             }
                             // console.log(this.selectedFeatures);
-                            
+                            // console.log(this)
+
+                            dom.byId("deleteMarkupSpan").style.display = "none";
+                            helper.queryLayer(
+                                this.config.layers.REVIEWED_ECOSHAPES,
+                                "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
+                                ['objectid'],
+                                function (results) {
+                                    if (Array.isArray(results.features) && results.features.length != 0) {
+                                        dom.byId("deleteMarkupSpan").style.display = "inline-block";
+                                    }
+                                }
+                            )
+
+
+                            dom.byId("infoPanel").style.display = "none";
+                            helper.setEcoshapeInfo(this.selectedFeatures[0].ecoshapeid, this.speciesSelect.value);
+
+                            dom.byId("removalReasonDiv").style.display = "none";
+                            dom.byId("markupPanel").style.display = "block";
+
+                            helper.setMarkupOptions(this.selectedFeatures[0], this.markupSelect, this);
                         }));
                     }));
                 }
