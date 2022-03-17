@@ -167,18 +167,24 @@ define([
                 this.dataModel.reviewID = reviewID;
 
                 let layerStructure = LayerStructure.getInstance();
-                layerStructure.traversal(function (layerNode) {
+                layerStructure.traversal(lang.hitch(this, function (layerNode) {
                     if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)") {
-                        layerNode.getLayerObject().then((layer) => {
+                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                             layer.setDefinitionExpression("rangemapid=" + rangeMapID);
-                        });
+
+                            let query = new Query();
+                            query.outFields = ["*"];
+                            layer.queryExtent(query, lang.hitch(this, function (e, count) {
+                                this.map.setExtent(e.extent);
+                            }));
+                        }));
                     }
                     else if (layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
                         layerNode.getLayerObject().then((layer) => {
                             layer.setDefinitionExpression("reviewid=" + reviewID);
                         });
                     }
-                });
+                }));
             }));
         },
         mapReviewEcoshapeIDs: function (url, dict) {

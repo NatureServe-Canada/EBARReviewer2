@@ -119,11 +119,49 @@ define([
                 }
             }));
 
+            let layerStructure = LayerStructure.getInstance();
+            layerStructure.traversal(lang.hitch(this, function (layerNode) {
+                // console.log(layerNode.title);
+                if (layerNode.title === "ReviewerApp2 - Ecoshapes (generalized)") {
+                    layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
+                        layer.on("selection-complete", lang.hitch(this, function (val) {
+                            if (val.method === FeatureLayer.SELECTION_NEW) {
+                                this.selectedFeatures = [val.features[0].attributes];
+                            }
+                            else if (val.method === FeatureLayer.SELECTION_ADD) {
+                                if (this.selectedFeatures) {
+                                    let isPresent = false;
+                                    for (let i = 0; i < this.selectedFeatures.length; i++) {
+                                        if (this.selectedFeatures[i].objectid === val.features[0].attributes.objectid)
+                                            isPresent = true;
+                                    }
+                                    if (!isPresent)
+                                        this.selectedFeatures.push(val.features[0].attributes);
+                                }
+                                else
+                                    this.selectedFeatures = [val.features[0].attributes];
+                            }
+                            else if(val.method === FeatureLayer.SELECTION_SUBTRACT) {
+                                if(this.selectedFeatures) {
+                                    for (let i = 0; i < this.selectedFeatures.length; i++) {
+                                        if (this.selectedFeatures[i].objectid === val.features[0].attributes.objectid)
+                                            this.selectedFeatures.splice(i,1);
+                                    }
+                                }
+                            }
+                            // console.log(this.selectedFeatures);
+                            
+                        }));
+                    }));
+                }
+            }));
+
             // this.fetchDataByName('Select');
         },
 
         onReceiveData: function (name, widgetId, data, historyData) {
             //filter out messages
+            return;
             if (name !== 'Select') {
                 return;
             }
@@ -166,7 +204,7 @@ define([
             /* jshint unused:false*/
             console.log('onSignIn');
 
-            new Helper().setUserTaxaSpecies(credential.userId, this);
+            helper.setUserTaxaSpecies(credential.userId, this);
 
             this.userCredentials = credential;
         },
