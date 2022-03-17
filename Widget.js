@@ -83,6 +83,8 @@ define([
                         }
                     })
                 );
+                dom.byId("markupPanel").style.display = "none";
+                dom.byId("infoPanel").style.display = "block";
                 return;
                 if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
                     helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
@@ -144,6 +146,8 @@ define([
                         }
                     })
                 );
+                dom.byId("markupPanel").style.display = "none";
+                dom.byId("infoPanel").style.display = "block";
                 return;
                 if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
                     helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
@@ -211,11 +215,11 @@ define([
                                         dom.byId("deleteMarkupSpan").style.display = "inline-block";
                                     }
                                 }
-                            )
+                            );
 
 
                             dom.byId("infoPanel").style.display = "none";
-                            helper.setEcoshapeInfo(this.selectedFeatures[0].ecoshapeid, this.speciesSelect.value);
+                            helper.setEcoshapeInfo(this.selectedFeatures[0], this.speciesSelect.value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
                             dom.byId("markupPanel").style.display = "block";

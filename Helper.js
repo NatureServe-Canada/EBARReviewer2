@@ -147,7 +147,26 @@ define([
                 }
             }));
         },
-        setEcoshapeInfo: function (ecoshapeId, ecoshapeSpecies) {
+        setEcoshapeInfo: function (feature, ecoshapeSpecies, parentObj) {
+            dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
+            dom.byId("ecozone").innerHTML = feature.ecozone;
+            dom.byId("terrestrialArea").innerHTML = `${Math.round((feature.terrestrialarea / 1000000) * 100) / 100} km<sup>2</sup>`;
+            dom.byId("ecoshapeName").innerHTML = feature.ecoshapename;
+            dom.byId("ecoshapeSpecies").innerHTML = ecoshapeSpecies;
+            dom.byId("terrestrialProportion").innerHTML = `${Math.round(feature.terrestrialproportion * 100 * 10) / 10}%`;
+            this.queryLayer(
+                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
+                "ecoshapeid=" + feature.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
+                ['presence'],
+                function (results) {
+                    if (results.features.length !=0) {
+                        dom.byId("ecoshapePresence").innerHTML = results.features[0].attributes.presence;
+                        dom.byId("ecoshapeMetadata").innerHTML = parentObj.rangeMetadata.innerHTML;
+                    }
+                }
+            )
+
+            return;
             this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6",
                 "ecoshapeid=" + ecoshapeId,
