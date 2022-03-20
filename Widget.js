@@ -65,6 +65,11 @@ define([
                     }
                 }
 
+                if(!starRating) {
+                    alert("please provide a star rating");
+                    return;
+                }
+
                 helper.queryLayer(
                     this.config.layers.REVIEW,
                     "reviewid=" + this.dataModel.reviewID,
