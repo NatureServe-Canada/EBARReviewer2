@@ -28,9 +28,9 @@
             <span><b>Metadata:</b></span>
             <span data-dojo-attach-point='rangeMetadata'></span>
         </div>
-        <div><span data-dojo-attach-point='rangeMapNotes'></span></div>
+        <div><span data-dojo-attach-point='rangeMapNotes'></span></div><br>
 
-        <div data-dojo-attach-point="messageNode"></div>
+        <button class="esri-button" id="overallFeedbackButton" disabled>Overall Feedback</button>
     </div>
     <div id="markupPanel" style="display: none">
         <!-- <button class="esri-button" id="backButton">Back</button> -->
@@ -82,19 +82,44 @@
             </div>
             <div>
                 <label for="comment">Comment (required):</label><br>
-                <input type="text" name="comment" id="comment" data-dojo-type="dijit/form/TextBox" />
+                <textarea id="comment" name="comment" rows="4" cols="30"></textarea>
             </div>
             <div>
                 <label for="reference">Reference:</label><br>
-                <input type="text" name="reference" id="reference" data-dojo-type="dijit/form/TextBox" />
+                <textarea id="reference" name="reference" rows="4" cols="30"></textarea>
             </div>
             <div>
                 <span>
                     <button class="esri-button" id="backButton">Back</button>
-                    <span id="deleteMarkupSpan"><button class="esri-button" id="deleteMarkup">Delete Markup</button></span>
+                    <span id="deleteMarkupSpan"><button class="esri-button" id="deleteMarkup">Delete
+                            Markup</button></span>
                     <button class="esri-button" id="saveButton">Save</button>
                 </span>
             </div>
+        </div>
+    </div>
+    <div id="overallFeedbackDiv" style="display:none">
+        <div id="overallFeedback">
+            <h4>Please provide overall range feedback</h4><br>
+            <b>Star Rating:</b>
+            <div>
+                <input type="radio" name="rating" id="radioOne" value="1" /> <label for="radioOne">One</label>
+                <input type="radio" name="rating" id="radioTwo" value="2" /> <label for="radioTwo">Two</label>
+                <input type="radio" name="rating" id="radioThree" value="3" /> <label for="radioThree">Three</label>
+                <input type="radio" name="rating" id="radioFour" value="4" /> <label for="radioFour">Four</label>
+                <input type="radio" name="rating" id="radioFive" value="5" /> <label for="radioFive">Five</label>
+            </div><br>
+            <div>
+                <label for="overallComment"><b>Overall comment:</b></label><br>
+                <textarea id="overallComment" name="overallComment" rows="4" cols="30"></textarea>
+            </div>
+        </div><br>
+        <div>
+            <span>
+                <button class="esri-button" id="closeOverallFeedbackButton">Close</button>
+                <button class="esri-button" id="SaveOverallFeedbackButton">Save</button>
+                <button class="esri-button" id="SubmitOverallFeedbackButton">Submit</button>
+            </span>
         </div>
     </div>
 </div>

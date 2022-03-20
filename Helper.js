@@ -270,6 +270,8 @@ define([
                         });
                     }
                 }));
+
+                dom.byId("overallFeedbackButton").disabled = false;
             }));
         },
         mapReviewEcoshapeIDs: function (url, dict) {

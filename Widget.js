@@ -54,6 +54,48 @@ define([
             helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES.URL, this.dataModel.echoshapesDict);
             helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
+            on(dom.byId("SaveOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
+                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW);
+
+                let starRating = null;
+                let radioButtons = document.getElementsByName("rating");
+                for (var i = 0; i < radioButtons.length; i++) {
+                    if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
+                        starRating = parseInt(radioButtons[i].value);
+                    }
+                }
+
+                helper.queryLayer(
+                    this.config.layers.REVIEW,
+                    "reviewid=" + this.dataModel.reviewID,
+                    ['objectid'],
+                    null)
+                    .then((results) => {
+                        let objectID = results.features[0].attributes['objectid'];
+                        let graphicObj = new graphic();
+                        graphicObj.setAttributes({
+                            objectid: objectID,
+                            reviewnotes: dom.byId("overallComment").value,
+                            overallstarrating: starRating
+                        });
+
+                        reviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                            console.log("Overall Comment posted");
+                        });
+                    });
+
+            }));
+
+            on(dom.byId("closeOverallFeedbackButton"), "click", function (e) {
+                dom.byId("overallFeedbackDiv").style.display = "none";
+                dom.byId("infoPanel").style.display = "block";
+            });
+
+            on(dom.byId("overallFeedbackButton"), "click", function (e) {
+                dom.byId("infoPanel").style.display = "none";
+                dom.byId("overallFeedbackDiv").style.display = "block";
+            });
+
             on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";

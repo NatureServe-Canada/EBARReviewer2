@@ -7,6 +7,7 @@
         "REVIEWED_ECOSHAPES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11",
         "SPECIES_RANGE_ECOSHAPES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
         "REVIEW_RANGEMAP_SPECIES": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
-        "ECOSHAPE_REVIEW": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3"
+        "ECOSHAPE_REVIEW": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3",
+        "REVIEW": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp/FeatureServer/4"
     }
 }
