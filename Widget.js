@@ -54,6 +54,38 @@ define([
             helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES.URL, this.dataModel.echoshapesDict);
             helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
 
+            on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
+                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW);
+
+                let starRating = null;
+                let radioButtons = document.getElementsByName("rating");
+                for (var i = 0; i < radioButtons.length; i++) {
+                    if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
+                        starRating = parseInt(radioButtons[i].value);
+                    }
+                }
+
+                if (!starRating) {
+                    alert("please provide a star rating");
+                    return;
+                }
+
+                let graphicObj = new graphic();
+                graphicObj.setAttributes({
+                    objectid: this.dataModel.reviewObjectID,
+                    reviewnotes: dom.byId("overallComment").value,
+                    overallstarrating: starRating,
+                    datecompleted: new Date().getTime()
+                });
+
+                reviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                    dom.byId("review_submitted").style.display = "block";
+                    dom.byId("saveButton").disabled = true;
+                    dom.byId("SaveOverallFeedbackButton").disabled = true;
+                    dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                });
+            }));
+
             on(dom.byId("SaveOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW);
 
@@ -65,7 +97,7 @@ define([
                     }
                 }
 
-                if(!starRating) {
+                if (!starRating) {
                     alert("please provide a star rating");
                     return;
                 }
