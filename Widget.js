@@ -83,6 +83,7 @@ define([
                     dom.byId("saveButton").disabled = true;
                     dom.byId("SaveOverallFeedbackButton").disabled = true;
                     dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                    dom.byId("deleteMarkup").disabled = true;
                 });
             }));
 

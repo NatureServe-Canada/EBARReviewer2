@@ -21,54 +21,25 @@ define([
                 "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
                 ['presence'],
                 function (results) {
-                    if (Array.isArray(results.features) && results.features.length != 0) {
-                        let presence = results.features[0].attributes['presence'];
+                    let pDict = {
+                        P: "Present",
+                        X: "Presence Expected",
+                        H: "Historical",
+                        R: "Remove"
+                    };
 
-                        let values = null
-                        if (presence === 'P') {
-                            values = [
-                                { label: "Presence Expected", value: "X" },
-                                { label: "Historical", value: "H" },
-                                { label: "Remove", value: "R" }
-                            ];
-                        }
-                        else if (presence === 'H') {
-                            values = [
-                                { label: "Present", value: "P" },
-                                { label: "Presence Expected", value: "X" },
-                                { label: "Remove", value: "R" }
-                            ];
-                        }
-                        else {
-                            values = [
-                                { label: "Present", value: "P" },
-                                { label: "Historical", value: "H" },
-                                { label: "Remove", value: "R" }
-                            ];
-                        }
-
-                        let options = [];
-                        for (let i = 0; i < values.length; i++) {
-                            options.push({
-                                label: values[i]['label'],
-                                value: values[i]['value']
-                            });
-                        }
-
-                        markupList.set('options', options);
+                    let presence = results.features.length != 0 ? results.features[0].attributes['presence'] : null;
+                    // let options = [{label: "None set", value: "", disabled:true, selected: "selected"}];
+                    for (let key in pDict) {
+                        if (presence && (presence === key || presence === "R")) continue;
+                        if (!presence && key === "R") continue;
+                        options.push({
+                            label: pDict[key],
+                            value: key
+                        });
                     }
-                    else {
-                        let values = [{ label: "Present", value: "P" }, { label: "Presence Expected", value: "X" }, { label: "Historical", value: "H" }];
-                        let options = [];
-                        for (let i = 0; i < values.length; i++) {
-                            options.push({
-                                label: values[i]['label'],
-                                value: values[i]['value']
-                            });
-                        }
 
-                        markupList.set('options', options);
-                    }
+                    markupList.set('options', options);
                     markupList.on('change', lang.hitch(this, function (val) {
                         let removalReasonDiv = dom.byId("removalReasonDiv");
                         if (val === 'R') {
@@ -94,7 +65,8 @@ define([
                 ['presence'],
                 function (results) {
                     if (results.features.length != 0) {
-                        dom.byId("ecoshapePresence").innerHTML = results.features[0].attributes.presence;
+                        let presence = results.features[0].attributes.presence;
+                        dom.byId("ecoshapePresence").innerHTML = presence === "P" ? "Present" : presence === "H" ? "Historical" : "Presence Expected";
                         dom.byId("ecoshapeMetadata").innerHTML = parentObj.rangeMetadata.innerHTML;
                     }
                     else {
@@ -204,12 +176,14 @@ define([
                                         dom.byId("saveButton").disabled = true;
                                         dom.byId("SaveOverallFeedbackButton").disabled = true;
                                         dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                                        dom.byId("deleteMarkup").disabled = true;
                                     }
                                     else {
                                         dom.byId("review_submitted").style.display = "none";
                                         dom.byId("saveButton").disabled = false;
                                         dom.byId("SaveOverallFeedbackButton").disabled = false;
                                         dom.byId("SubmitOverallFeedbackButton").disabled = false;
+                                        dom.byId("deleteMarkup").disabled = false;
                                     }
                                 }
                             }));
