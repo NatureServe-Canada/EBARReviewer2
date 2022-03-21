@@ -128,10 +128,23 @@ define([
                 dom.byId("infoPanel").style.display = "block";
             });
 
-            on(dom.byId("overallFeedbackButton"), "click", function (e) {
+            on(dom.byId("overallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 dom.byId("infoPanel").style.display = "none";
+                helper.queryLayer(
+                    this.config.layers.REVIEW,
+                    "reviewid=" + this.dataModel.reviewID,
+                    ['overallstarrating', 'reviewnotes'],
+                    null)
+                    .then((results) => {
+                        if (results.features.length != 0) {
+                            // results.features[0].attributes['overallstarrating']\
+                            dom.byId("radio" + results.features[0].attributes['overallstarrating']).checked = true;
+                            dom.byId("overallComment").value = results.features[0].attributes['reviewnotes'];
+                        }
+                    });
+
                 dom.byId("overallFeedbackDiv").style.display = "block";
-            });
+            }));
 
             on(dom.byId('backButton'), "click", function (e) {
                 dom.byId("markupPanel").style.display = "none";
@@ -281,8 +294,6 @@ define([
                                     }
                                 }
                             }
-                            // console.log(this.selectedFeatures);
-                            // console.log(this)
 
                             dom.byId("deleteMarkupSpan").style.display = "none";
                             helper.queryLayer(
@@ -308,33 +319,6 @@ define([
                     }));
                 }
             }));
-
-            // this.fetchDataByName('Select');
-        },
-
-        onReceiveData: function (name, widgetId, data, historyData) {
-            //filter out messages
-            return;
-            if (name !== 'Select') {
-                return;
-            }
-            this.dataModel.ReviewerApp2_9712 = data.selectionInfo.ReviewerApp2_9712;
-            this.dataModel.ReviewerApp2_3112 = data.selectionInfo.ReviewerApp2_3112;
-            this.dataModel.ReviewerApp2_2465 = data.selectionInfo.ReviewerApp2_2465;
-
-            dom.byId("deleteMarkupSpan").style.display = "none";
-            if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
-                dom.byId("deleteMarkupSpan").style.display = "inline-block";
-            }
-
-            dom.byId("infoPanel").style.display = "none";
-
-            helper.setEcoshapeInfo(data.selectionInfo.ReviewerApp2_3112[0], this.speciesSelect.value);
-
-            dom.byId("removalReasonDiv").style.display = "none";
-            dom.byId("markupPanel").style.display = "block";
-
-            helper.setMarkupOptions(data, this.markupSelect);
         },
 
         // onOpen: function(){
