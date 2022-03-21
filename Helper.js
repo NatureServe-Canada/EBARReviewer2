@@ -29,7 +29,7 @@ define([
                     };
 
                     let presence = results.features.length != 0 ? results.features[0].attributes['presence'] : null;
-                    // let options = [{label: "None set", value: "", disabled:true, selected: "selected"}];
+                    let options = [];
                     for (let key in pDict) {
                         if (presence && (presence === key || presence === "R")) continue;
                         if (!presence && key === "R") continue;
@@ -80,7 +80,7 @@ define([
             this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
                 `Username = '${username}'`,
-                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME"],
+                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME", "NSX_URL"],
                 lang.hitch(widgetObj, this._setSpeciesDropdown)
             );
         },
@@ -134,7 +134,7 @@ define([
                         this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
                         this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
                         this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
-                        this.speciesInformation.innerHTML = '<a href="https://explorer.natureserve.org/Search#q">go to NatureServe Explorer</a>';
+                        this.speciesInformation.innerHTML = '<a href='+featureAttributes['nsx_url'] +'>go to NatureServe Explorer</a>';
 
                         rangeMapID = featureAttributes['rangemapid'];
                         reviewID = featureAttributes['reviewid'];
