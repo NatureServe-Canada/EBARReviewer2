@@ -159,7 +159,7 @@ define([
                 "ecoshapeid=" + feature.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
                 ['presence'],
                 function (results) {
-                    if (results.features.length !=0) {
+                    if (results.features.length != 0) {
                         dom.byId("ecoshapePresence").innerHTML = results.features[0].attributes.presence;
                         dom.byId("ecoshapeMetadata").innerHTML = parentObj.rangeMetadata.innerHTML;
                     }
@@ -269,6 +269,32 @@ define([
                             layer.setDefinitionExpression("reviewid=" + reviewID);
                         });
                     }
+
+                    if (layerNode.title === "ReviewerApp2 - Review") {
+                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
+                            var query = new Query();
+                            query.where = "reviewid=" + reviewID + " and rangeMapID=" + rangeMapID;
+                            query.outFields = ["*"];
+                            layer.queryFeatures(query).then(lang.hitch(this, (results) => {
+                                if (results.features.length != 0) {
+                                    this.dataModel.reviewObjectID = results.features[0].attributes['objectid'];
+                                    if (results.features[0].attributes['datecompleted']) {
+                                        dom.byId("review_submitted").style.display = "block";
+                                        dom.byId("saveButton").disabled = true;
+                                        dom.byId("SaveOverallFeedbackButton").disabled = true;
+                                        dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                                    }
+                                    else {
+                                        dom.byId("review_submitted").style.display = "none";
+                                        dom.byId("saveButton").disabled = false;
+                                        dom.byId("SaveOverallFeedbackButton").disabled = false;
+                                        dom.byId("SubmitOverallFeedbackButton").disabled = false;
+                                    }
+                                }
+                            }));
+                        }));
+                    }
+                    // console.log(layerNode.title)
                 }));
 
                 dom.byId("overallFeedbackButton").disabled = false;
