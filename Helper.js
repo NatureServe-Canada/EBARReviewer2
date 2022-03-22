@@ -134,7 +134,7 @@ define([
                         this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
                         this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
                         this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
-                        this.speciesInformation.innerHTML = '<a href='+featureAttributes['nsx_url'] +'>go to NatureServe Explorer</a>';
+                        this.speciesInformation.innerHTML = '<a href=' + featureAttributes['nsx_url'] + '>go to NatureServe Explorer</a>';
 
                         rangeMapID = featureAttributes['rangemapid'];
                         reviewID = featureAttributes['reviewid'];
@@ -160,6 +160,11 @@ define([
                     else if (layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
                         layerNode.getLayerObject().then((layer) => {
                             layer.setDefinitionExpression("reviewid=" + reviewID);
+                        });
+                    }
+                    else if (layerNode.title === "RangeMapInput") {
+                        layerNode.getLayerObject().then((layer) => {
+                            layer.setDefinitionExpression("rangemapid=" + rangeMapID);
                         });
                     }
 
