@@ -136,8 +136,10 @@ define([
                     .then((results) => {
                         if (results.features.length != 0) {
                             // results.features[0].attributes['overallstarrating']\
-                            dom.byId("radio" + results.features[0].attributes['overallstarrating']).checked = true;
-                            dom.byId("overallComment").value = results.features[0].attributes['reviewnotes'];
+                            if (results.features[0].attributes['overallstarrating'] != null && results.features[0].attributes['reviewnotes'] != null) {
+                                dom.byId("radio" + results.features[0].attributes['overallstarrating']).checked = true;
+                                dom.byId("overallComment").value = results.features[0].attributes['reviewnotes'];
+                            }
                         }
                     });
 
