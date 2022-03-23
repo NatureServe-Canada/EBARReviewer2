@@ -13,10 +13,10 @@ define([
             queryParams.where = where;
             queryParams.outFields = outFields;
             var queryTask = new QueryTask(url);
-            return queryTask.execute(queryParams, method, lang.hitch(this, this._onSearchError));
+            return queryTask.execute(queryParams, method, this._onSearchError);
         },
         setMarkupOptions: function (data, markupList, parentObj) {
-            this.queryLayer(
+            return this.queryLayer(
                 "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
                 "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
                 ['presence'],

@@ -178,20 +178,6 @@ define([
                 );
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
-                return;
-                if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
-                    helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
-                        .then((objectID) => {
-                            let graphicObj = new graphic();
-                            graphicObj.setAttributes({
-                                objectid: objectID
-                            });
-
-                            ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
-                                new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
-                            });
-                        });
-                }
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
@@ -241,27 +227,6 @@ define([
                 );
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
-                return;
-                if (Array.isArray(this.dataModel.ReviewerApp2_9712) && this.dataModel.ReviewerApp2_9712.length != 0) {
-                    helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
-                        .then((objectID) => {
-                            attributes.objectid = objectID;
-                            let graphicObj = new graphic();
-                            graphicObj.setAttributes(attributes);
-
-                            ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
-                            });
-                        });
-                }
-                else {
-                    let graphicObj = new graphic();
-                    graphicObj.setAttributes(attributes);
-
-                    ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
-                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
-                    });
-                }
             }));
 
             let layerStructure = LayerStructure.getInstance();
@@ -308,14 +273,40 @@ define([
                                 }
                             );
 
-
                             dom.byId("infoPanel").style.display = "none";
                             helper.setEcoshapeInfo(this.selectedFeatures[0], this.speciesSelect.value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
                             dom.byId("markupPanel").style.display = "block";
 
-                            helper.setMarkupOptions(this.selectedFeatures[0], this.markupSelect, this);
+                            dom.byId("comment").value = "";
+                            dom.byId("reference").value = "";
+
+                            helper.setMarkupOptions(this.selectedFeatures[0], this.markupSelect, this)
+                                .then(lang.hitch(this, () => {
+                                    helper.queryLayer(
+                                        this.config.layers.ECOSHAPE_REVIEW,
+                                        "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
+                                        ['objectid', 'reference', 'ecoshapereviewnotes', 'markup'],
+                                        lang.hitch(this, function (results) {
+                                            if (Array.isArray(results.features) && results.features.length != 0) {
+                                                let attr = results.features[0].attributes;
+                                                dom.byId("comment").value = attr['ecoshapereviewnotes'];
+                                                dom.byId("reference").value = attr['reference'];
+                                                // this.markupSelect.value = attr['markup'];
+                                                // console.log(this.markupSelect.options)
+                                                for (var i = 0; i < this.markupSelect.options.length; i++) {
+                                                    // console.log(this.markupSelect.options[i].selected);
+                                                    console.log(this.markupSelect.options[i].value)
+                                                    if (this.markupSelect.options[i].value === attr['markup']) {
+                                                        this.markupSelect.options[i].selected = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    );
+                                }))
                         }));
                     }));
                 }
