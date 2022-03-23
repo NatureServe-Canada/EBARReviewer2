@@ -51,11 +51,8 @@ define([
 
             this.dataModel = new DataModel();
 
-            helper.mapReviewEcoshapeIDs(this.config.layers.ECOSHAPES.URL, this.dataModel.echoshapesDict);
-            helper.mapReviewEcoshapeIDs(this.config.layers.REVIEWED_ECOSHAPES, this.dataModel.speciesRangeEcoshapesDict);
-
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
-                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW);
+                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
                 let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
@@ -88,7 +85,7 @@ define([
             }));
 
             on(dom.byId("SaveOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
-                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW);
+                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
                 let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
@@ -104,7 +101,7 @@ define([
                 }
 
                 helper.queryLayer(
-                    this.config.layers.REVIEW,
+                    this.config.layers.REVIEW.URL,
                     "reviewid=" + this.dataModel.reviewID,
                     ['objectid'],
                     null)
@@ -132,7 +129,7 @@ define([
             on(dom.byId("overallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 dom.byId("infoPanel").style.display = "none";
                 helper.queryLayer(
-                    this.config.layers.REVIEW,
+                    this.config.layers.REVIEW.URL,
                     "reviewid=" + this.dataModel.reviewID,
                     ['overallstarrating', 'reviewnotes'],
                     null)
@@ -153,16 +150,16 @@ define([
             });
 
             on(dom.byId('deleteMarkup'), "click", lang.hitch(this, function (e) {
-                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
+                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
                 let ecoshapeID = this.selectedFeatures[0].ecoshapeid;
 
                 helper.queryLayer(
-                    this.config.layers.REVIEWED_ECOSHAPES,
+                    this.config.layers.REVIEWED_ECOSHAPES.URL,
                     "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID,
                     ['objectid'],
                     lang.hitch(this, function (results) {
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
+                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW.URL, this.dataModel.reviewID, ecoshapeID)
                                 .then((objectID) => {
                                     let graphicObj = new graphic();
                                     graphicObj.setAttributes({
@@ -181,7 +178,7 @@ define([
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
-                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW);
+                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
                 let ecoshapeID = this.selectedFeatures[0].ecoshapeid;
 
                 let attributes = {
@@ -199,12 +196,12 @@ define([
                 }
 
                 helper.queryLayer(
-                    this.config.layers.REVIEWED_ECOSHAPES,
+                    this.config.layers.REVIEWED_ECOSHAPES.URL,
                     "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID,
                     ['objectid'],
                     lang.hitch(this, function (results) {
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW, this.dataModel.reviewID, ecoshapeID)
+                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW.URL, this.dataModel.reviewID, ecoshapeID)
                                 .then((objectID) => {
                                     attributes.objectid = objectID;
                                     let graphicObj = new graphic();
@@ -231,11 +228,10 @@ define([
 
             let layerStructure = LayerStructure.getInstance();
             layerStructure.traversal(lang.hitch(this, function (layerNode) {
-                // console.log(layerNode.title);
-                if (layerNode.title === "ReviewerApp2 - Ecoshapes (generalized)") {
+
+                if (layerNode.title === this.config.layers.ECOSHAPES.title) {
                     layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                         layer.on("selection-complete", lang.hitch(this, function (val) {
-                            // console.log(val);
                             if (val.method === FeatureLayer.SELECTION_NEW) {
                                 this.selectedFeatures = [val.features[0].attributes];
                             }
@@ -263,7 +259,7 @@ define([
 
                             dom.byId("deleteMarkupSpan").style.display = "none";
                             helper.queryLayer(
-                                this.config.layers.REVIEWED_ECOSHAPES,
+                                this.config.layers.REVIEWED_ECOSHAPES.URL,
                                 "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
                                 ['objectid'],
                                 function (results) {
@@ -274,7 +270,7 @@ define([
                             );
 
                             dom.byId("infoPanel").style.display = "none";
-                            helper.setEcoshapeInfo(this.selectedFeatures[0], this.speciesSelect.value, this);
+                            helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this.speciesSelect.value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
                             dom.byId("markupPanel").style.display = "block";
@@ -282,10 +278,10 @@ define([
                             dom.byId("comment").value = "";
                             dom.byId("reference").value = "";
 
-                            helper.setMarkupOptions(this.selectedFeatures[0], this.markupSelect, this)
+                            helper.setMarkupOptions(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this.markupSelect, this)
                                 .then(lang.hitch(this, () => {
                                     helper.queryLayer(
-                                        this.config.layers.ECOSHAPE_REVIEW,
+                                        this.config.layers.ECOSHAPE_REVIEW.URL,
                                         "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
                                         ['objectid', 'reference', 'ecoshapereviewnotes', 'markup'],
                                         lang.hitch(this, function (results) {

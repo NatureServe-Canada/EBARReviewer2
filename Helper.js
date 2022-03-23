@@ -15,9 +15,9 @@ define([
             var queryTask = new QueryTask(url);
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
-        setMarkupOptions: function (data, markupList, parentObj) {
+        setMarkupOptions: function (layerObj, data, markupList, parentObj) {
             return this.queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
+                layerObj.URL,
                 "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
                 ['presence'],
                 function (results) {
@@ -52,7 +52,7 @@ define([
                 }
             )
         },
-        setEcoshapeInfo: function (feature, ecoshapeSpecies, parentObj) {
+        setEcoshapeInfo: function (layerObj, feature, ecoshapeSpecies, parentObj) {
             dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
             dom.byId("ecozone").innerHTML = feature.ecozone;
             dom.byId("terrestrialArea").innerHTML = `${Math.round((feature.terrestrialarea / 1000000) * 100) / 100} km<sup>2</sup>`;
@@ -60,7 +60,7 @@ define([
             dom.byId("ecoshapeSpecies").innerHTML = ecoshapeSpecies;
             dom.byId("terrestrialProportion").innerHTML = `${Math.round(feature.terrestrialproportion * 100 * 10) / 10}%`;
             this.queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10",
+                layerObj.URL,
                 "ecoshapeid=" + feature.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
                 ['presence'],
                 function (results) {
@@ -78,7 +78,7 @@ define([
         },
         setUserTaxaSpecies: function (username, widgetObj) {
             this.queryLayer(
-                "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12",
+                widgetObj.config.layers.REVIEW_RANGEMAP_SPECIES.URL,
                 `Username = '${username}'`,
                 ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME", "NSX_URL"],
                 lang.hitch(widgetObj, this._setSpeciesDropdown)
@@ -146,7 +146,7 @@ define([
 
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(lang.hitch(this, function (layerNode) {
-                    if (layerNode.title === "ReviewerApp2 - Species Range Ecoshapes (generalized)") {
+                    if (layerNode.title === this.config.layers.SPECIES_RANGE_ECOSHAPES.title) {
                         layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                             layer.setDefinitionExpression("rangemapid=" + rangeMapID);
 
@@ -157,7 +157,7 @@ define([
                             }));
                         }));
                     }
-                    else if (layerNode.title === "ReviewerApp2 - Reviewed Ecoshapes (generalized)") {
+                    else if (layerNode.title === this.config.layers.REVIEWED_ECOSHAPES.title) {
                         layerNode.getLayerObject().then((layer) => {
                             layer.setDefinitionExpression("reviewid=" + reviewID);
                         });
@@ -168,7 +168,7 @@ define([
                         });
                     }
 
-                    if (layerNode.title === "ReviewerApp2 - Review") {
+                    if (layerNode.title === this.config.layers.REVIEW.title) {
                         layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                             var query = new Query();
                             query.where = "reviewid=" + reviewID + " and rangeMapID=" + rangeMapID;
