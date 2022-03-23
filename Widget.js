@@ -193,13 +193,14 @@ define([
                     ecoshapeid: ecoshapeID,
                     ecoshapereviewnotes: dom.byId("comment").value,
                     username: this.userCredentials.userId,
-                    markup: this.markupSelect.value
+                    markup: dom.byId("markupSelect").value
                 };
                 if (dom.byId("reference").value) {
                     attributes.reference = dom.byId("reference").value;
                 }
-                if (this.markupSelect.value === 'R' && this.removalReason.value) {
-                    attributes.removalreason = this.removalReason.value;
+                let removalReason = dom.byId("removalReason");
+                if (dom.byId("markupSelect").value === 'R' && removalReason.value) {
+                    attributes.removalreason = removalReason.value;
                 }
 
                 helper.queryLayer(
@@ -285,26 +286,23 @@ define([
                             dom.byId("comment").value = "";
                             dom.byId("reference").value = "";
 
-                            helper.setMarkupOptions(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this.markupSelect, this)
+                            helper.setMarkupOptions(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this)
                                 .then(lang.hitch(this, () => {
+                                    let selectElem = document.getElementById('markupSelect');
                                     helper.queryLayer(
                                         this.config.layers.ECOSHAPE_REVIEW.URL,
                                         "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
-                                        ['objectid', 'reference', 'ecoshapereviewnotes', 'markup'],
+                                        ['objectid', 'reference', 'ecoshapereviewnotes', 'markup', 'removalreason'],
                                         lang.hitch(this, function (results) {
                                             if (Array.isArray(results.features) && results.features.length != 0) {
                                                 let attr = results.features[0].attributes;
                                                 dom.byId("comment").value = attr['ecoshapereviewnotes'];
                                                 dom.byId("reference").value = attr['reference'];
-                                                // this.markupSelect.value = attr['markup'];
-                                                // console.log(this.markupSelect.options)
-                                                for (var i = 0; i < this.markupSelect.options.length; i++) {
-                                                    // console.log(this.markupSelect.options[i].selected);
-                                                    console.log(this.markupSelect.options[i].value)
-                                                    if (this.markupSelect.options[i].value === attr['markup']) {
-                                                        this.markupSelect.options[i].selected = true;
-                                                        break;
-                                                    }
+
+                                                selectElem.value = attr['markup'];
+                                                if(attr['markup'] == 'R') {
+                                                    dom.byId("removalReason").value = attr['removalreason'];
+                                                    dom.byId("removalReasonDiv").style.display = "block";
                                                 }
                                             }
                                         })

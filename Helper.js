@@ -2,10 +2,12 @@ define([
     'dojo/_base/lang',
     'dojo/_base/declare',
     'dojo/dom',
+    'dojo/on',
+    'dojo/dom-construct',
     'esri/tasks/query',
     'esri/tasks/QueryTask',
     'jimu/LayerStructure',
-], function (lang, declare, dom, Query, QueryTask, LayerStructure) {
+], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method) {
             var queryParams = new Query();
@@ -15,7 +17,12 @@ define([
             var queryTask = new QueryTask(url);
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
-        setMarkupOptions: function (layerObj, data, markupList, parentObj) {
+        setMarkupOptions: function (layerObj, data, parentObj) {
+            let markupSelectObj = dom.byId("markupSelect");
+            while (markupSelectObj.lastChild) {
+                markupSelectObj.removeChild(markupSelectObj.lastChild);
+            }
+
             return this.queryLayer(
                 layerObj.URL,
                 "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
@@ -29,26 +36,32 @@ define([
                     };
 
                     let presence = results.features.length != 0 ? results.features[0].attributes['presence'] : null;
-                    let options = [];
+
+                    domConstruct.create("option", {
+                        innerHTML: "None Set",
+                        selected: "",
+                        disabled: "",
+                        value: ""
+                    }, markupSelectObj);
+
                     for (let key in pDict) {
                         if (presence && (presence === key || presence === "R")) continue;
                         if (!presence && key === "R") continue;
-                        options.push({
-                            label: pDict[key],
+                        domConstruct.create("option", {
+                            innerHTML: pDict[key],
                             value: key
-                        });
+                        }, markupSelectObj);
                     }
 
-                    markupList.set('options', options);
-                    markupList.on('change', lang.hitch(this, function (val) {
+                    on(markupSelectObj, "change", lang.hitch(this, function (val) {
                         let removalReasonDiv = dom.byId("removalReasonDiv");
-                        if (val === 'R') {
+                        if (markupSelectObj.value === 'R') {
                             removalReasonDiv.style.display = "block";
                         }
                         else {
                             removalReasonDiv.style.display = "none";
                         }
-                    }));
+                    }))
                 }
             )
         },
