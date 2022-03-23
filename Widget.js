@@ -127,6 +127,12 @@ define([
             });
 
             on(dom.byId("overallFeedbackButton"), "click", lang.hitch(this, function (e) {
+                let elements = document.getElementsByName('rating');
+                for (i = 0; i < elements.length; i++) {
+                    if (elements[i].checked) elements[i].checked = false;
+                }
+                dom.byId("overallComment").value = "";
+
                 dom.byId("infoPanel").style.display = "none";
                 helper.queryLayer(
                     this.config.layers.REVIEW.URL,
@@ -135,7 +141,6 @@ define([
                     null)
                     .then((results) => {
                         if (results.features.length != 0) {
-                            // results.features[0].attributes['overallstarrating']\
                             if (results.features[0].attributes['overallstarrating'] != null && results.features[0].attributes['reviewnotes'] != null) {
                                 dom.byId("radio" + results.features[0].attributes['overallstarrating']).checked = true;
                                 dom.byId("overallComment").value = results.features[0].attributes['reviewnotes'];

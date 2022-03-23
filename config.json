@@ -1,15 +1,15 @@
 {
     "layers": {
         "ECOSHAPES": {
-            "title": "Ecoshapes (generalized)",
+            "title": "ReviewerApp2 - Ecoshapes (generalized)",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6"
         },
         "REVIEWED_ECOSHAPES": {
-            "title": "Reviewed Ecoshapes (generalized)",
+            "title": "ReviewerApp2 - Reviewed Ecoshapes (generalized)",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11"
         },
         "SPECIES_RANGE_ECOSHAPES": {
-            "title": "Species Range Ecoshapes (generalized)",
+            "title": "ReviewerApp2 - Species Range Ecoshapes (generalized)",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10"
         },
         "REVIEW_RANGEMAP_SPECIES": {
