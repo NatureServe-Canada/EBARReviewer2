@@ -28,23 +28,10 @@ define([
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin, lang,
     dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure) {
-    //To create a widget, you need to derive from BaseWidget.
+
     var helper = new Helper();
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
-        // Custom widget code goes here
-
         baseClass: 'jimu-widget-reviewerwidget',
-
-        //this property is set by the framework when widget is loaded.
-        //name: 'CustomWidget',
-
-
-        //methods to communication with app container:
-
-        // postCreate: function() {
-        //   this.inherited(arguments);
-        //   console.log('postCreate');
-        // },
 
         startup: function () {
             this.inherited(arguments);
@@ -241,30 +228,41 @@ define([
                     layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                         layer.on("selection-complete", lang.hitch(this, function (val) {
                             if (val.method === FeatureLayer.SELECTION_NEW) {
-                                this.selectedFeatures = [val.features[0].attributes];
+                                this.selectedFeatures = [];
+                                for (let i = 0; i < val.features.length; i++) {
+                                    this.selectedFeatures.push(val.features[i].attributes)
+                                }
                             }
                             else if (val.method === FeatureLayer.SELECTION_ADD) {
                                 if (this.selectedFeatures) {
-                                    let isPresent = false;
-                                    for (let i = 0; i < this.selectedFeatures.length; i++) {
-                                        if (this.selectedFeatures[i].objectid === val.features[0].attributes.objectid)
-                                            isPresent = true;
+                                    for (let i = 0; i < val.features.length; i++) {
+                                        let isPresent = false;
+                                        for (let j = 0; j < this.selectedFeatures.length; j++) {
+                                            if (this.selectedFeatures[j].objectid === val.features[i].attributes.objectid)
+                                                isPresent = true;
+                                        }
+                                        if (!isPresent)
+                                            this.selectedFeatures.push(val.features[i].attributes);
                                     }
-                                    if (!isPresent)
-                                        this.selectedFeatures.push(val.features[0].attributes);
                                 }
-                                else
-                                    this.selectedFeatures = [val.features[0].attributes];
+                                else {
+                                    this.selectedFeatures = [];
+                                    for (let i = 0; i < val.features.length; i++) {
+                                        this.selectedFeatures.push(val.features[i].attributes)
+                                    }
+                                }
                             }
                             else if (val.method === FeatureLayer.SELECTION_SUBTRACT) {
                                 if (this.selectedFeatures) {
-                                    for (let i = 0; i < this.selectedFeatures.length; i++) {
-                                        if (this.selectedFeatures[i].objectid === val.features[0].attributes.objectid)
-                                            this.selectedFeatures.splice(i, 1);
+                                    for (let j = 0; j < val.features.length; j++) {
+                                        for (let i = 0; i < this.selectedFeatures.length; i++) {
+                                            if (this.selectedFeatures[i].objectid === val.features[j].attributes.objectid)
+                                                this.selectedFeatures.splice(i, 1);
+                                        }
                                     }
                                 }
                             }
-
+                            console.log(this.selectedFeatures)
                             dom.byId("deleteMarkupSpan").style.display = "none";
                             helper.queryLayer(
                                 this.config.layers.REVIEWED_ECOSHAPES.URL,
@@ -300,7 +298,7 @@ define([
                                                 dom.byId("reference").value = attr['reference'];
 
                                                 selectElem.value = attr['markup'];
-                                                if(attr['markup'] == 'R') {
+                                                if (attr['markup'] == 'R') {
                                                     dom.byId("removalReason").value = attr['removalreason'];
                                                     dom.byId("removalReasonDiv").style.display = "block";
                                                 }
@@ -314,44 +312,9 @@ define([
             }));
         },
 
-        // onOpen: function(){
-        //   console.log('onOpen');
-        // },
-
-        // onClose: function(){
-        //   console.log('onClose');
-        // },
-
-        // onMinimize: function(){
-        //   console.log('onMinimize');
-        // },
-
-        // onMaximize: function(){
-        //   console.log('onMaximize');
-        // },
-
         onSignIn: function (credential) {
-            /* jshint unused:false*/
-            console.log('onSignIn');
-
             helper.setUserTaxaSpecies(credential.userId, this);
-
             this.userCredentials = credential;
         },
-
-        // onSignOut: function(){
-        //   console.log('onSignOut');
-        // }
-
-        // onPositionChange: function(){
-        //   console.log('onPositionChange');
-        // },
-
-        // resize: function(){
-        //   console.log('resize');
-        // }
-
-        //methods to communication between widgets:
-
     });
 });
