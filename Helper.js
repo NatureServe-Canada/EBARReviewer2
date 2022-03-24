@@ -178,7 +178,7 @@ define([
                             layer.setDefinitionExpression("reviewid=" + reviewID);
                         });
                     }
-                    else if (layerNode.title === "RangeMapInput") {
+                    else if (layerNode.title === "Species Range Input") {
                         layerNode.getLayerObject().then((layer) => {
                             layer.setDefinitionExpression("rangemapid=" + rangeMapID);
                         });
