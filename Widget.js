@@ -161,7 +161,7 @@ define([
                                     });
 
                                     ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
-                                        new helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)")
+                                        new helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
                                     });
                                 });
                         }
@@ -203,7 +203,7 @@ define([
                                     graphicObj.setAttributes(attributes);
 
                                     ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                        helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
+                                        helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
                                     });
                                 });
                         }
@@ -212,7 +212,7 @@ define([
                             graphicObj.setAttributes(attributes);
 
                             ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
-                                helper.refreshMapLayer("ReviewerApp2 - Reviewed Ecoshapes (generalized)");
+                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
                             });
                         }
                     })
