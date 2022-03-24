@@ -63,6 +63,8 @@ define([
                 });
 
                 reviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                    dom.byId("overallFeedbackDiv").style.display = "none";
+                    dom.byId("infoPanel").style.display = "block";
                     dom.byId("review_submitted").style.display = "block";
                     dom.byId("saveButton").disabled = true;
                     dom.byId("SaveOverallFeedbackButton").disabled = true;
@@ -103,9 +105,10 @@ define([
 
                         reviewLayer.applyEdits(null, [graphicObj]).then(() => {
                             console.log("Overall Comment posted");
+                            dom.byId("overallFeedbackDiv").style.display = "none";
+                            dom.byId("infoPanel").style.display = "block";
                         });
                     });
-
             }));
 
             on(dom.byId("closeOverallFeedbackButton"), "click", function (e) {
