@@ -182,12 +182,25 @@ define([
                     username: this.userCredentials.userId,
                     markup: dom.byId("markupSelect").value
                 };
+                if (!dom.byId("markupSelect").value) {
+                    alert("Please provide markup");
+                    return;
+                }
+                if (!dom.byId("comment").value) {
+                    alert("Please provide markup comments");
+                    return;
+                }
                 if (dom.byId("reference").value) {
                     attributes.reference = dom.byId("reference").value;
                 }
                 let removalReason = dom.byId("removalReason");
-                if (dom.byId("markupSelect").value === 'R' && removalReason.value) {
-                    attributes.removalreason = removalReason.value;
+                if (dom.byId("markupSelect").value === 'R') {
+                    if (removalReason.value)
+                        attributes.removalreason = removalReason.value;
+                    else {
+                        alert("Please provide removal reason");
+                        return;
+                    }
                 }
 
                 helper.queryLayer(
@@ -262,7 +275,9 @@ define([
                                     }
                                 }
                             }
-                            console.log(this.selectedFeatures)
+
+                            if (!this.selectedFeatures) return;
+
                             dom.byId("deleteMarkupSpan").style.display = "none";
                             helper.queryLayer(
                                 this.config.layers.REVIEWED_ECOSHAPES.URL,
@@ -279,6 +294,7 @@ define([
                             helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this.speciesSelect.value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
+                            dom.byId("removalReasonBr").style.display = "none";
                             dom.byId("markupPanel").style.display = "block";
 
                             dom.byId("comment").value = "";
@@ -301,6 +317,7 @@ define([
                                                 if (attr['markup'] == 'R') {
                                                     dom.byId("removalReason").value = attr['removalreason'];
                                                     dom.byId("removalReasonDiv").style.display = "block";
+                                                    dom.byId("removalReasonBr").style.display = "block";
                                                 }
                                             }
                                         })

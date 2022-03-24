@@ -55,11 +55,14 @@ define([
 
                     on(markupSelectObj, "change", lang.hitch(this, function (val) {
                         let removalReasonDiv = dom.byId("removalReasonDiv");
+                        let removalReasonBr = dom.byId("removalReasonBr");
                         if (markupSelectObj.value === 'R') {
                             removalReasonDiv.style.display = "block";
+                            removalReasonBr.style.display = "block";
                         }
                         else {
                             removalReasonDiv.style.display = "none";
+                            removalReasonBr.style.display = "none";
                         }
                     }))
                 }
