@@ -95,14 +95,13 @@ define([
         setUserTaxaSpecies: function (username, widgetObj) {
             this.queryLayer(
                 widgetObj.config.layers.REVIEW_RANGEMAP_SPECIES.URL,
-                `Username = '${username}'`,
+                `username = '${username}' and includeinebarreviewer=1`,
                 ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME", "NSX_URL"],
                 lang.hitch(widgetObj, this._setSpeciesDropdown)
             );
         },
         _setSpeciesDropdown: function (results) {
-            let taxGroups = new Set();
-            let layerData = [];
+            let taxGroups = new Set(), layerData = [];
             for (let i = 0; i < results.features.length; i++) {
                 let featureAttributes = results.features[i].attributes;
                 layerData.push({
@@ -112,6 +111,19 @@ define([
                 taxGroups.add(featureAttributes['tax_group']);
             }
 
+            layerData.sort(function (a, b) {
+                if (a.tax_group > b.tax_group) return 1;
+                if (b.tax_group > a.tax_group) return -1;
+                if (a.tax_group == b.tax_group) {
+                    if (a.national_scientific_name > b.national_scientific_name) return 1;
+                    if (b.national_scientific_name > a.national_scientific_name) return -1;
+                    return 0;
+                }
+            });
+
+            let taxGroupsArr = Array.from(taxGroups);
+            taxGroupsArr.sort();
+
             let taxaSelect = dom.byId("taxaSelect");
             domConstruct.create("option", {
                 innerHTML: "None Set",
@@ -119,7 +131,7 @@ define([
                 disabled: "",
                 value: ""
             }, taxaSelect);
-            taxGroups.forEach((val) => {
+            taxGroupsArr.forEach((val) => {
                 domConstruct.create("option", {
                     innerHTML: val,
                     value: val
