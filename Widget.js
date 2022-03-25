@@ -141,10 +141,20 @@ define([
                 dom.byId("overallFeedbackDiv").style.display = "block";
             }));
 
-            on(dom.byId('backButton'), "click", function (e) {
+            on(dom.byId('backButton'), "click", lang.hitch(this, function (e) {
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
-            });
+
+                let layerStructure = LayerStructure.getInstance();
+                layerStructure.traversal(lang.hitch(this, function (layerNode) {
+                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
+                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
+                            layer.clearSelection();
+                        }));
+                    }
+                }));
+
+            }));
 
             on(dom.byId('deleteMarkup'), "click", lang.hitch(this, function (e) {
                 let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
@@ -172,6 +182,14 @@ define([
                 );
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
+                let layerStructure = LayerStructure.getInstance();
+                layerStructure.traversal(lang.hitch(this, function (layerNode) {
+                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
+                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
+                            layer.clearSelection();
+                        }));
+                    }
+                }));
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
@@ -235,6 +253,15 @@ define([
                 );
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
+
+                let layerStructure = LayerStructure.getInstance();
+                layerStructure.traversal(lang.hitch(this, function (layerNode) {
+                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
+                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
+                            layer.clearSelection();
+                        }));
+                    }
+                }));
             }));
 
             let layerStructure = LayerStructure.getInstance();
@@ -279,7 +306,7 @@ define([
                                 }
                             }
 
-                            if (!this.selectedFeatures) return;
+                            if (!this.selectedFeatures || this.selectedFeatures.length == 0) return;
 
                             dom.byId("deleteMarkupSpan").style.display = "none";
                             helper.queryLayer(
