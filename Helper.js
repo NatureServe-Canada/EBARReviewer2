@@ -194,32 +194,30 @@ define([
                             layer.setDefinitionExpression("rangemapid=" + rangeMapID);
                         });
                     }
+                }));
 
-                    if (layerNode.title === this.config.layers.REVIEW.title) {
-                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
-                            var query = new Query();
-                            query.where = "reviewid=" + reviewID + " and rangeMapID=" + rangeMapID;
-                            query.outFields = ["*"];
-                            layer.queryFeatures(query).then(lang.hitch(this, (results) => {
-                                if (results.features.length != 0) {
-                                    this.dataModel.reviewObjectID = results.features[0].attributes['objectid'];
-                                    if (results.features[0].attributes['datecompleted']) {
-                                        dom.byId("review_submitted").style.display = "block";
-                                        dom.byId("saveButton").disabled = true;
-                                        dom.byId("SaveOverallFeedbackButton").disabled = true;
-                                        dom.byId("SubmitOverallFeedbackButton").disabled = true;
-                                        dom.byId("deleteMarkup").disabled = true;
-                                    }
-                                    else {
-                                        dom.byId("review_submitted").style.display = "none";
-                                        dom.byId("saveButton").disabled = false;
-                                        dom.byId("SaveOverallFeedbackButton").disabled = false;
-                                        dom.byId("SubmitOverallFeedbackButton").disabled = false;
-                                        dom.byId("deleteMarkup").disabled = false;
-                                    }
-                                }
-                            }));
-                        }));
+                var queryParams = new Query();
+                queryParams.returnGeometry = false;
+                queryParams.where = "reviewid=" + reviewID + " and rangeMapID=" + rangeMapID;
+                queryParams.outFields = ["*"];
+                var queryTask = new QueryTask(this.config.layers.REVIEW.URL);
+                queryTask.execute(queryParams, lang.hitch(this, (results) => {
+                    if (results.features.length != 0) {
+                        this.dataModel.reviewObjectID = results.features[0].attributes['objectid'];
+                        if (results.features[0].attributes['datecompleted']) {
+                            dom.byId("review_submitted").style.display = "block";
+                            dom.byId("saveButton").disabled = true;
+                            dom.byId("SaveOverallFeedbackButton").disabled = true;
+                            dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                            dom.byId("deleteMarkup").disabled = true;
+                        }
+                        else {
+                            dom.byId("review_submitted").style.display = "none";
+                            dom.byId("saveButton").disabled = false;
+                            dom.byId("SaveOverallFeedbackButton").disabled = false;
+                            dom.byId("SubmitOverallFeedbackButton").disabled = false;
+                            dom.byId("deleteMarkup").disabled = false;
+                        }
                     }
                 }));
 
