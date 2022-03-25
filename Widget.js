@@ -145,15 +145,7 @@ define([
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
 
-                let layerStructure = LayerStructure.getInstance();
-                layerStructure.traversal(lang.hitch(this, function (layerNode) {
-                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
-                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
-                            layer.clearSelection();
-                        }));
-                    }
-                }));
-
+                helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
 
             on(dom.byId('deleteMarkup'), "click", lang.hitch(this, function (e) {
@@ -182,14 +174,8 @@ define([
                 );
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
-                let layerStructure = LayerStructure.getInstance();
-                layerStructure.traversal(lang.hitch(this, function (layerNode) {
-                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
-                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
-                            layer.clearSelection();
-                        }));
-                    }
-                }));
+
+                helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
@@ -254,22 +240,18 @@ define([
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
 
-                let layerStructure = LayerStructure.getInstance();
-                layerStructure.traversal(lang.hitch(this, function (layerNode) {
-                    if (layerNode.title === this.config.layers.ECOSHAPES.title) {
-                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
-                            layer.clearSelection();
-                        }));
-                    }
-                }));
+                helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
 
             let layerStructure = LayerStructure.getInstance();
             layerStructure.traversal(lang.hitch(this, function (layerNode) {
-
                 if (layerNode.title === this.config.layers.ECOSHAPES.title) {
                     layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
                         layer.on("selection-complete", lang.hitch(this, function (val) {
+                            if (!dom.byId("speciesSelect").value || dom.byId("speciesSelect").value === "") {
+                                layer.clearSelection();
+                                return;
+                            }
                             if (val.method === FeatureLayer.SELECTION_NEW) {
                                 this.selectedFeatures = [];
                                 for (let i = 0; i < val.features.length; i++) {

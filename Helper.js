@@ -260,6 +260,14 @@ define([
                 return featureAttributes['objectid'];
             });
         },
+
+        clearSelectionByLayer(layerTitle) {
+            let layerStructure = LayerStructure.getInstance();
+            layerStructure.traversal(function (layerNode) {
+                if (layerNode.title === layerTitle)
+                    layerNode.getLayerObject().then((layer) => layer.clearSelection());
+            });
+        },
         _onSearchError: function (error) {
             console.error(error);
         },
