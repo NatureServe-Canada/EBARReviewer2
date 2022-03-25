@@ -294,7 +294,7 @@ define([
                             );
 
                             dom.byId("infoPanel").style.display = "none";
-                            helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this.speciesSelect.value, this);
+                            helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], dom.byId('speciesSelect').value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
                             dom.byId("removalReasonBr").style.display = "none";

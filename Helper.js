@@ -53,7 +53,7 @@ define([
                         }, markupSelectObj);
                     }
 
-                    on(markupSelectObj, "change", lang.hitch(this, function (val) {
+                    on(markupSelectObj, "change", lang.hitch(this, function () {
                         let removalReasonDiv = dom.byId("removalReasonDiv");
                         let removalReasonBr = dom.byId("removalReasonBr");
                         if (markupSelectObj.value === 'R') {
@@ -64,7 +64,7 @@ define([
                             removalReasonDiv.style.display = "none";
                             removalReasonBr.style.display = "none";
                         }
-                    }))
+                    }));
                 }
             )
         },
@@ -101,50 +101,61 @@ define([
             );
         },
         _setSpeciesDropdown: function (results) {
-            var layerData = [];
-            for (var i = 0; i < results.features.length; i++) {
-                var featureAttributes = results.features[i].attributes;
-                let obj = {};
-                for (var attr in featureAttributes) {
-                    obj[attr] = featureAttributes[attr];
-                }
-                layerData.push(obj);
+            let taxGroups = new Set();
+            let layerData = [];
+            for (let i = 0; i < results.features.length; i++) {
+                let featureAttributes = results.features[i].attributes;
+                layerData.push({
+                    "tax_group": featureAttributes["tax_group"],
+                    "national_scientific_name": featureAttributes["national_scientific_name"]
+                });
+                taxGroups.add(featureAttributes['tax_group']);
             }
 
-            let taxGroups = new Set();
-            layerData.forEach((record) => taxGroups.add(record['tax_group']));
-
-            let taxGroupOptions = [];
+            let taxaSelect = dom.byId("taxaSelect");
+            domConstruct.create("option", {
+                innerHTML: "None Set",
+                selected: "",
+                disabled: "",
+                value: ""
+            }, taxaSelect);
             taxGroups.forEach((val) => {
-                taxGroupOptions.push({
-                    label: val,
+                domConstruct.create("option", {
+                    innerHTML: val,
                     value: val
-                });
+                }, taxaSelect);
             });
 
-            this.taxaSelect.set('options', taxGroupOptions);
-            this.taxaSelect.on('change', lang.hitch(this, function (val) {
-                let suboptions = [];
+            let speciesSelect = dom.byId("speciesSelect");
+            on(taxaSelect, "change", lang.hitch(this, function () {
+                while (speciesSelect.lastChild) {
+                    speciesSelect.removeChild(speciesSelect.lastChild);
+                }
+
+                domConstruct.create("option", {
+                    innerHTML: "None Set",
+                    selected: "",
+                    disabled: "",
+                    value: ""
+                }, speciesSelect);
+
                 for (let i = 0; i < layerData.length; i++) {
-                    if (layerData[i]['tax_group'] == val) {
-                        suboptions.push({
-                            label: layerData[i]['national_scientific_name'],
+                    if (layerData[i]['tax_group'] == taxaSelect.value) {
+                        domConstruct.create("option", {
+                            innerHTML: layerData[i]['national_scientific_name'],
                             value: layerData[i]['national_scientific_name']
-                        });
+                        }, speciesSelect);
                     }
                 }
-                this.speciesSelect.reset();
-                // suboptions[0]['selected'] = true;
-                this.speciesSelect.set('options', suboptions);
             }));
 
             let rangeMapID = null;
             let reviewID = null;
 
-            this.speciesSelect.on('change', lang.hitch(this, function (val) {
+            on(speciesSelect, "change", lang.hitch(this, function () {
                 for (var i = 0; i < results.features.length; i++) {
                     var featureAttributes = results.features[i].attributes;
-                    if (featureAttributes['national_scientific_name'] == val) {
+                    if (featureAttributes['national_scientific_name'] == speciesSelect.value) {
                         this.rangeVersion.innerHTML = featureAttributes['rangeversion'];
                         this.rangeStage.innerHTML = featureAttributes['rangestage'];
                         this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
