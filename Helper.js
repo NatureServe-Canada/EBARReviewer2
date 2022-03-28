@@ -173,7 +173,7 @@ define([
                         this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
                         this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
                         this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
-                        this.speciesInformation.innerHTML = '<a href=' + featureAttributes['nsx_url'] + '>go to NatureServe Explorer</a>';
+                        this.speciesInformation.innerHTML = '<a href=' + featureAttributes['nsx_url'] + ' target="_blank" rel="noopener noreferrer">go to NatureServe Explorer</a>';
 
                         rangeMapID = featureAttributes['rangemapid'];
                         reviewID = featureAttributes['reviewid'];
