@@ -25,9 +25,10 @@ define([
     './Helper',
     './DataModel',
     'jimu/LayerStructure',
+    'esri/tasks/query',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin, lang,
-    dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure) {
+    dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure, Query) {
 
     var helper = new Helper();
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
@@ -56,7 +57,7 @@ define([
 
                 let graphicObj = new graphic();
                 graphicObj.setAttributes({
-                    objectid: this.dataModel.reviewObjectID,
+                    objectid: this.dataModel.overallReviewObjectID,
                     reviewnotes: dom.byId("overallComment").value,
                     overallstarrating: starRating,
                     datecompleted: new Date().getTime()
@@ -89,26 +90,20 @@ define([
                     return;
                 }
 
-                helper.queryLayer(
-                    this.config.layers.REVIEW.URL,
-                    "reviewid=" + this.dataModel.reviewID,
-                    ['objectid'],
-                    null)
-                    .then((results) => {
-                        let objectID = results.features[0].attributes['objectid'];
-                        let graphicObj = new graphic();
-                        graphicObj.setAttributes({
-                            objectid: objectID,
-                            reviewnotes: dom.byId("overallComment").value,
-                            overallstarrating: starRating
-                        });
-
-                        reviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                            console.log("Overall Comment posted");
-                            dom.byId("overallFeedbackDiv").style.display = "none";
-                            dom.byId("infoPanel").style.display = "block";
-                        });
+                if (this.dataModel.overallReviewObjectID) {
+                    let graphicObj = new graphic();
+                    graphicObj.setAttributes({
+                        objectid: this.dataModel.overallReviewObjectID,
+                        reviewnotes: dom.byId("overallComment").value,
+                        overallstarrating: starRating
                     });
+
+                    reviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                        console.log("Overall Comment posted");
+                        dom.byId("overallFeedbackDiv").style.display = "none";
+                        dom.byId("infoPanel").style.display = "block";
+                    });
+                }
             }));
 
             on(dom.byId("closeOverallFeedbackButton"), "click", function (e) {
@@ -124,19 +119,12 @@ define([
                 dom.byId("overallComment").value = "";
 
                 dom.byId("infoPanel").style.display = "none";
-                helper.queryLayer(
-                    this.config.layers.REVIEW.URL,
-                    "reviewid=" + this.dataModel.reviewID,
-                    ['overallstarrating', 'reviewnotes'],
-                    null)
-                    .then((results) => {
-                        if (results.features.length != 0) {
-                            if (results.features[0].attributes['overallstarrating'] != null && results.features[0].attributes['reviewnotes'] != null) {
-                                dom.byId("radio" + results.features[0].attributes['overallstarrating']).checked = true;
-                                dom.byId("overallComment").value = results.features[0].attributes['reviewnotes'];
-                            }
-                        }
-                    });
+
+                if (this.dataModel.overallReviewRating) {
+                    dom.byId("radio" + this.dataModel.overallReviewRating).checked = true;
+                    if (this.dataModel.overallReviewComment)
+                        dom.byId("overallComment").value = this.dataModel.overallReviewComment;
+                }
 
                 dom.byId("overallFeedbackDiv").style.display = "block";
             }));
@@ -152,26 +140,29 @@ define([
                 let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
                 let ecoshapeID = this.selectedFeatures[0].ecoshapeid;
 
-                helper.queryLayer(
-                    this.config.layers.REVIEWED_ECOSHAPES.URL,
-                    "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID,
-                    ['objectid'],
-                    lang.hitch(this, function (results) {
+                var query = new Query();
+                query.outFields = ["objectid"];
+                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID;
+                ecochapeReviewLayer.queryFeatures(query)
+                    .then((results) => {
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW.URL, this.dataModel.reviewID, ecoshapeID)
-                                .then((objectID) => {
-                                    let graphicObj = new graphic();
-                                    graphicObj.setAttributes({
-                                        objectid: objectID
-                                    });
-
-                                    ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
-                                        new helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
-                                    });
-                                });
+                            return results.features[0].attributes['objectid'];
                         }
+                        return null;
                     })
-                );
+                    .then((objectID) => {
+                        if (objectID) {
+                            let graphicObj = new graphic();
+                            graphicObj.setAttributes({
+                                objectid: objectID
+                            });
+
+                            ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
+                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
+                            });
+                        }
+                    });
+
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
 
@@ -210,22 +201,26 @@ define([
                     }
                 }
 
-                helper.queryLayer(
-                    this.config.layers.REVIEWED_ECOSHAPES.URL,
-                    "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID,
-                    ['objectid'],
-                    lang.hitch(this, function (results) {
+                var query = new Query();
+                query.outFields = ["objectid"];
+                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID;
+                ecochapeReviewLayer.queryFeatures(query)
+                    .then((results) => {
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            helper.getObjectID(this.config.layers.ECOSHAPE_REVIEW.URL, this.dataModel.reviewID, ecoshapeID)
-                                .then((objectID) => {
-                                    attributes.objectid = objectID;
-                                    let graphicObj = new graphic();
-                                    graphicObj.setAttributes(attributes);
+                            return results.features[0].attributes['objectid'];
+                        }
+                        return null;
+                    })
+                    .then((objectID) => {
+                        if (objectID) {
+                            attributes.objectid = objectID;
+                            let graphicObj = new graphic();
+                            graphicObj.setAttributes(attributes);
 
-                                    ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                        helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
-                                    });
-                                });
+                            ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+                            });
+
                         }
                         else {
                             let graphicObj = new graphic();
@@ -235,8 +230,8 @@ define([
                                 helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
                             });
                         }
-                    })
-                );
+                    });
+
                 dom.byId("markupPanel").style.display = "none";
                 dom.byId("infoPanel").style.display = "block";
 

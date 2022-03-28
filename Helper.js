@@ -9,7 +9,7 @@ define([
     'jimu/LayerStructure',
 ], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure) {
     return declare(null, {
-        queryLayer: function (url, where, outFields, method) {
+        queryLayer: function (url, where, outFields, method=null) {
             var queryParams = new Query();
             queryParams.returnGeometry = false;
             queryParams.where = where;
@@ -215,7 +215,9 @@ define([
                 var queryTask = new QueryTask(this.config.layers.REVIEW.URL);
                 queryTask.execute(queryParams, lang.hitch(this, (results) => {
                     if (results.features.length != 0) {
-                        this.dataModel.reviewObjectID = results.features[0].attributes['objectid'];
+                        this.dataModel.overallReviewObjectID = results.features[0].attributes['objectid'];
+                        this.dataModel.overallReviewRating = results.features[0].attributes['overallstarrating'];
+                        this.dataModel.overallReviewComment = results.features[0].attributes['reviewnotes'];
                         if (results.features[0].attributes['datecompleted']) {
                             dom.byId("review_submitted").style.display = "block";
                             dom.byId("saveButton").disabled = true;
