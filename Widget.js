@@ -100,7 +100,7 @@ define([
                     });
 
                     reviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                        console.log("Overall Comment posted");
+                        console.log("Overall Feedback Comment posted");
                         dom.byId("overallFeedbackDiv").style.display = "none";
                         dom.byId("infoPanel").style.display = "block";
                     });
@@ -139,26 +139,27 @@ define([
 
             on(dom.byId('deleteMarkup'), "click", lang.hitch(this, function (e) {
                 let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
-                let ecoshapeID = this.selectedFeatures[0].ecoshapeid;
+                if (this.reviewedEcoshapes.length == 0) return;
+                let ecoshapeIDs = [];
+                this.reviewedEcoshapes.forEach(x => ecoshapeIDs.push(x.ecoshapeid));
 
                 var query = new Query();
                 query.outFields = ["objectid"];
-                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID;
+                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid in (" + ecoshapeIDs + ")";
                 ecochapeReviewLayer.queryFeatures(query)
                     .then((results) => {
+                        let objectIDs = []
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            return results.features[0].attributes['objectid'];
+                            results.features.forEach(x => objectIDs.push(x.attributes['objectid']));
                         }
-                        return null;
+                        return objectIDs;
                     })
-                    .then((objectID) => {
-                        if (objectID) {
-                            let graphicObj = new graphic();
-                            graphicObj.setAttributes({
-                                objectid: objectID
-                            });
+                    .then((objectIDs) => {
+                        if (objectIDs.length != 0) {
+                            let graphicObjs = [];
+                            objectIDs.forEach(x => graphicObjs.push(new graphic().setAttributes({ objectid: x })));
 
-                            ecochapeReviewLayer.applyEdits(null, null, [graphicObj]).then(() => {
+                            ecochapeReviewLayer.applyEdits(null, null, graphicObjs).then(() => {
                                 helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
                             });
                         }
@@ -171,16 +172,6 @@ define([
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
-                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
-                let ecoshapeID = this.selectedFeatures[0].ecoshapeid;
-
-                let attributes = {
-                    reviewid: this.dataModel.reviewID,
-                    ecoshapeid: ecoshapeID,
-                    ecoshapereviewnotes: dom.byId("comment").value,
-                    username: this.userCredentials.userId,
-                    markup: dom.byId("markupSelect").value
-                };
                 if (!dom.byId("markupSelect").value) {
                     alert("Please provide markup");
                     return;
@@ -189,9 +180,18 @@ define([
                     alert("Please provide markup comments");
                     return;
                 }
-                if (dom.byId("reference").value) {
-                    attributes.reference = dom.byId("reference").value;
-                }
+
+                let ecochapeReviewLayer = new FeatureLayer(this.config.layers.ECOSHAPE_REVIEW.URL);
+
+                let attributes = {
+                    reviewid: this.dataModel.reviewID,
+                    ecoshapereviewnotes: dom.byId("comment").value,
+                    username: this.userCredentials.userId,
+                    markup: dom.byId("markupSelect").value,
+                    removalreason: null,
+                    reference: dom.byId("reference").value
+                };
+
                 let removalReason = dom.byId("removalReason");
                 if (dom.byId("markupSelect").value === 'R') {
                     if (removalReason.value)
@@ -202,41 +202,87 @@ define([
                     }
                 }
 
+                let ecoshapeIDs = [], reviewedEcoshapeIDs = [], rangeMapEcoshapeIDs = [];
+                this.selectedFeatures.forEach(x => ecoshapeIDs.push(x.ecoshapeid));
+                this.reviewedEcoshapes.forEach(x => reviewedEcoshapeIDs.push(x.ecoshapeid));
+                this.speciesRangeEcoshapes.forEach(x => rangeMapEcoshapeIDs.push(x.ecoshapeid));
+
+                /* 
+                1. Remove can only be applied if the ecoshape is inside the range
+                2. Update features - if markup is already present
+                    a. if markup is changed from remove to add, then empty removalReason
+                3. Create features - if markup is not present
+
+                two requests to be made. One to update and one to add features
+                Update /insert how
+                a. If markup is remove, apply it to only relevant ecoshapes
+                */
+
+                let editResponses = [];
                 var query = new Query();
-                query.outFields = ["objectid"];
-                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid=" + ecoshapeID;
+                query.outFields = ["*"];
+                query.where = "reviewid=" + this.dataModel.reviewID + " and ecoshapeid in (" + ecoshapeIDs + ")";
                 ecochapeReviewLayer.queryFeatures(query)
-                    .then((results) => {
+                    .then(results => {
                         if (Array.isArray(results.features) && results.features.length != 0) {
-                            return results.features[0].attributes['objectid'];
-                        }
-                        return null;
-                    })
-                    .then((objectID) => {
-                        if (objectID) {
-                            attributes.objectid = objectID;
-                            let graphicObj = new graphic();
-                            graphicObj.setAttributes(attributes);
+                            let graphicObjs = [];
+                            for (let i = 0; i < results.features.length; i++) {
+                                if (dom.byId("markupSelect").value === 'R' &&
+                                    rangeMapEcoshapeIDs.indexOf(results.features[i].attributes.ecoshapeid) < 0)
+                                    continue;
 
-                            ecochapeReviewLayer.applyEdits(null, [graphicObj]).then(() => {
-                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
-                            });
+                                let flag = false;
+                                for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
+                                    if (results.features[i].attributes.ecoshapeid === this.speciesRangeEcoshapes[j].ecoshapeid &&
+                                        dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (flag) continue;
 
+                                let temp = JSON.parse(JSON.stringify(attributes));
+                                temp.objectid = results.features[i].attributes.objectid;
+                                graphicObjs.push(new graphic().setAttributes(temp));
+                            }
+                            editResponses.push(ecochapeReviewLayer.applyEdits(null, graphicObjs));
                         }
-                        else {
-                            let graphicObj = new graphic();
-                            graphicObj.setAttributes(attributes);
 
-                            ecochapeReviewLayer.applyEdits([graphicObj]).then(() => {
-                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
-                            });
+                        let insertecoshapeIDs = ecoshapeIDs.filter(x => !reviewedEcoshapeIDs.includes(x));
+                        if (insertecoshapeIDs.length != 0) {
+                            let graphicObjs = [];
+                            for (let i = 0; i < insertecoshapeIDs.length; i++) {
+                                if (dom.byId("markupSelect").value === 'R' &&
+                                    rangeMapEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0)
+                                    continue;
+
+                                let flag = false;
+                                for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
+                                    if (insertecoshapeIDs[i] === this.speciesRangeEcoshapes[j].ecoshapeid &&
+                                        dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (flag) continue;
+
+                                let temp = JSON.parse(JSON.stringify(attributes));
+                                temp.ecoshapeid = insertecoshapeIDs[i];
+                                graphicObjs.push(new graphic().setAttributes(temp));
+                            }
+                            editResponses.push(ecochapeReviewLayer.applyEdits(graphicObjs));
                         }
+
+                        all(editResponses).then(lang.hitch(this, function (results) {
+                            helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+
+                            dom.byId("markupPanel").style.display = "none";
+                            dom.byId("infoPanel").style.display = "block";
+
+                            helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
+                        }));
                     });
 
-                dom.byId("markupPanel").style.display = "none";
-                dom.byId("infoPanel").style.display = "block";
-
-                helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
 
             let layerStructure = LayerStructure.getInstance();
@@ -303,42 +349,40 @@ define([
                                 this.speciesRangeEcoshapes = results.speciesRangeEcoshapes;
 
                                 dom.byId("deleteMarkupSpan").style.display = "none";
-                                if(this.reviewedEcoshapes && this.reviewedEcoshapes.length != 0) {
+                                if (this.reviewedEcoshapes.length != 0) {
                                     dom.byId("deleteMarkupSpan").style.display = "inline-block";
                                 }
-                            }));
 
-                            dom.byId("infoPanel").style.display = "none";
-                            helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], dom.byId('speciesSelect').value, this);
+                                dom.byId("infoPanel").style.display = "none";
+                                dom.byId("markup_info_pane").style.display = "none";
+                                dom.byId("no_info_pane").style.display = "none";
 
-                            dom.byId("removalReasonDiv").style.display = "none";
-                            dom.byId("markupPanel").style.display = "block";
+                                dom.byId("comment").value = "";
+                                dom.byId("reference").value = "";
 
-                            dom.byId("comment").value = "";
-                            dom.byId("reference").value = "";
+                                dom.byId("removalReasonDiv").style.display = "none";
 
-                            helper.setMarkupOptions(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], this)
-                                .then(lang.hitch(this, () => {
-                                    let selectElem = document.getElementById('markupSelect');
-                                    helper.queryLayer(
-                                        this.config.layers.ECOSHAPE_REVIEW.URL,
-                                        "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
-                                        ['objectid', 'reference', 'ecoshapereviewnotes', 'markup', 'removalreason'],
-                                        lang.hitch(this, function (results) {
-                                            if (Array.isArray(results.features) && results.features.length != 0) {
-                                                let attr = results.features[0].attributes;
-                                                dom.byId("comment").value = attr['ecoshapereviewnotes'];
-                                                dom.byId("reference").value = attr['reference'];
-
-                                                selectElem.value = attr['markup'];
-                                                if (attr['markup'] == 'R') {
-                                                    dom.byId("removalReason").value = attr['removalreason'];
-                                                    dom.byId("removalReasonDiv").style.display = "block";
-                                                }
-                                            }
-                                        })
+                                if (this.selectedFeatures.length == 1) {
+                                    dom.byId("markup_info_pane").style.display = "block";
+                                    helper.setEcoshapeInfo(
+                                        this.selectedFeatures[0],
+                                        this.speciesRangeEcoshapes,
+                                        this.rangeMetadata.innerHTML,
                                     );
-                                }))
+                                }
+                                else {
+                                    dom.byId("no_info_pane").style.display = "block";
+                                }
+
+                                helper.setMarkupOptions(
+                                    this.selectedFeatures,
+                                    this.speciesRangeEcoshapes,
+                                    this.config.layers.ECOSHAPE_REVIEW.URL,
+                                    this.dataModel.reviewID
+                                );
+
+                                dom.byId("markupPanel").style.display = "block";
+                            }));
                         }));
                     }));
                 }
