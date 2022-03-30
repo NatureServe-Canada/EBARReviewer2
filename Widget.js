@@ -26,9 +26,10 @@ define([
     './DataModel',
     'jimu/LayerStructure',
     'esri/tasks/query',
+    'dojo/promise/all',
     'dojo/domReady!'
 ], function (declare, BaseWidget, _WidgetsInTemplateMixin, lang,
-    dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure, Query) {
+    dom, on, FeatureLayer, graphic, Helper, DataModel, LayerStructure, Query, all) {
 
     var helper = new Helper();
     return declare([BaseWidget, _WidgetsInTemplateMixin], {
@@ -285,23 +286,32 @@ define([
 
                             if (!this.selectedFeatures || this.selectedFeatures.length == 0) return;
 
-                            dom.byId("deleteMarkupSpan").style.display = "none";
-                            helper.queryLayer(
-                                this.config.layers.REVIEWED_ECOSHAPES.URL,
-                                "ecoshapeid=" + this.selectedFeatures[0].ecoshapeid + " and reviewid=" + this.dataModel.reviewID,
-                                ['objectid'],
-                                function (results) {
-                                    if (Array.isArray(results.features) && results.features.length != 0) {
-                                        dom.byId("deleteMarkupSpan").style.display = "inline-block";
-                                    }
+                            let ecoshapeIDs = [];
+                            this.selectedFeatures.forEach(x => ecoshapeIDs.push(x.ecoshapeid));
+
+                            all({
+                                reviewedEcoshapes: helper.fetchReviewedEcoshapes(
+                                    this.config.layers.REVIEWED_ECOSHAPES.URL,
+                                    "ecoshapeid in (" + ecoshapeIDs.toString() + ") and reviewid=" + this.dataModel.reviewID
+                                ),
+                                speciesRangeEcoshapes: helper.fetchReviewedEcoshapes(
+                                    this.config.layers.SPECIES_RANGE_ECOSHAPES.URL,
+                                    "ecoshapeid in (" + ecoshapeIDs.toString() + ") and rangemapid=" + this.dataModel.rangeMapID
+                                )
+                            }).then(lang.hitch(this, function (results) {
+                                this.reviewedEcoshapes = results.reviewedEcoshapes;
+                                this.speciesRangeEcoshapes = results.speciesRangeEcoshapes;
+
+                                dom.byId("deleteMarkupSpan").style.display = "none";
+                                if(this.reviewedEcoshapes && this.reviewedEcoshapes.length != 0) {
+                                    dom.byId("deleteMarkupSpan").style.display = "inline-block";
                                 }
-                            );
+                            }));
 
                             dom.byId("infoPanel").style.display = "none";
                             helper.setEcoshapeInfo(this.config.layers.SPECIES_RANGE_ECOSHAPES, this.selectedFeatures[0], dom.byId('speciesSelect').value, this);
 
                             dom.byId("removalReasonDiv").style.display = "none";
-                            dom.byId("removalReasonBr").style.display = "none";
                             dom.byId("markupPanel").style.display = "block";
 
                             dom.byId("comment").value = "";
@@ -324,7 +334,6 @@ define([
                                                 if (attr['markup'] == 'R') {
                                                     dom.byId("removalReason").value = attr['removalreason'];
                                                     dom.byId("removalReasonDiv").style.display = "block";
-                                                    dom.byId("removalReasonBr").style.display = "block";
                                                 }
                                             }
                                         })

@@ -9,8 +9,9 @@
             <select id="speciesSelect" style="min-width: 200px;"></select>
         </div>
         <div style="display: none;" id="review_submitted">
-            <span style="color:lightpink">REVIEW SUBMITTED, additional markup and feedback for this range map are not allowed.</span>      
-          </div>      
+            <span style="color:lightpink">REVIEW SUBMITTED, additional markup and feedback for this range map are not
+                allowed.</span>
+        </div>
         <div>
             <span><b>Range Version:</b></span>
             <span data-dojo-attach-point='rangeVersion'></span>
@@ -36,56 +37,64 @@
         <button class="esri-button" id="overallFeedbackButton" disabled>Overall Feedback</button>
     </div>
     <div id="markupPanel" style="display: none">
-        <!-- <button class="esri-button" id="backButton">Back</button> -->
-        <h1>Ecoshape: <span id="ecoshapeName"></span></h1>
-        <hr>
-        <div id="meta-data">
-            <div>
-                <span><b>Parent Ecoregion:</b></span>
-                <span id='parentEcoregion'></span>
+        <div>
+            <div id="markup_info_pane">
+                <h1>Ecoshape: <span id="ecoshapeName"></span></h1>
+                <hr>
+                <div>
+                    <span><b>Parent Ecoregion:</b></span>
+                    <span id='parentEcoregion'></span>
+                </div>
+                <div>
+                    <span><b>Ecozone:</b></span>
+                    <span id='ecozone'></span>
+                </div>
+                <div>
+                    <span><b>Terrestrial Area:</b></span>
+                    <span id='terrestrialArea'></span>
+                </div>
+                <div>
+                    <span><b>Terrestrial Proportion:</b></span>
+                    <span id='terrestrialProportion'></span>
+                </div>
+                <div>
+                    <span><b>Presence:</b></span>
+                    <span id='ecoshapePresence'></span></span>
+                </div>
+                <div>
+                    <span><b>Species:</b></span>
+                    <span id='ecoshapeSpecies'></span>
+                </div>
+                <div>
+                    <span><b>Metadata:</b></span>
+                    <span id='ecoshapeMetadata'></span>
+                </div>
             </div>
-            <div>
-                <span><b>Ecozone:</b></span>
-                <span id='ecozone'></span>
+            <div id="no_info_pane">
+                <h3>Multiple Ecoshapes selected</h3>
             </div>
-            <div>
-                <span><b>Terrestrial Area:</b></span>
-                <span id='terrestrialArea'></span>
-            </div>
-            <div>
-                <span><b>Terrestrial Proportion:</b></span>
-                <span id='terrestrialProportion'></span>
-            </div>
-            <div>
-                <span><b>Presence:</b></span>
-                <span id='ecoshapePresence'></span></span>
-            </div>
-            <div>
-                <span><b>Species:</b></span>
-                <span id='ecoshapeSpecies'></span>
-            </div>
-            <div>
-                <span><b>Metadata:</b></span>
-                <span id='ecoshapeMetadata'></span>
-            </div>
-            <br>
+        </div>
+        <br>
+        <div id="markup_form">
             <div>
                 <span>Markup (required):</span>
                 <select id="markupSelect" required></select>
             </div>
             <br>
             <div id='removalReasonDiv' style="display:none">
-                <label for="removalReason">Removal Reason (required):</label><br>
-                <select id="removalReason">
-                    <option disabled="" selected="" value="">None set</option>
-                    <option value="X">Presumed Extirpated</option>
-                    <option value="N">Never Was There</option>
-                    <option value="F">Reported But False</option>
-                    <option value="T">Transient/Vagrant</option>
-                    <option value="O">Other</option>
-                </select>
+                <div>
+                    <label for="removalReason">Removal Reason (required):</label><br>
+                    <select id="removalReason">
+                        <option disabled="" selected="" value="">None set</option>
+                        <option value="X">Presumed Extirpated</option>
+                        <option value="N">Never Was There</option>
+                        <option value="F">Reported But False</option>
+                        <option value="T">Transient/Vagrant</option>
+                        <option value="O">Other</option>
+                    </select>
+                </div>
+                <br>
             </div>
-            <br id='removalReasonBr' style="display:none">
             <div>
                 <label for="comment">Comment (required):</label><br>
                 <textarea id="comment" name="comment" rows="4" cols="30"></textarea>
@@ -99,7 +108,7 @@
             <div>
                 <span>
                     <button class="esri-button" id="backButton">Back</button>
-                    <span id="deleteMarkupSpan"><button class="esri-button" id="deleteMarkup">Delete
+                    <span id="deleteMarkupSpan" style="display:none"><button class="esri-button" id="deleteMarkup">Delete
                             Markup</button></span>
                     <button class="esri-button" id="saveButton">Save</button>
                 </span>

@@ -9,7 +9,7 @@ define([
     'jimu/LayerStructure',
 ], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure) {
     return declare(null, {
-        queryLayer: function (url, where, outFields, method=null) {
+        queryLayer: function (url, where, outFields, method = null) {
             var queryParams = new Query();
             queryParams.returnGeometry = false;
             queryParams.where = where;
@@ -17,80 +17,92 @@ define([
             var queryTask = new QueryTask(url);
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
-        setMarkupOptions: function (layerObj, data, parentObj) {
+        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, ECOSHAPE_REVIEW_URL, reviewID) {
             let markupSelectObj = dom.byId("markupSelect");
+            on(markupSelectObj, "change", lang.hitch(this, function () {
+                let removalReasonDiv = dom.byId("removalReasonDiv");
+                if (markupSelectObj.value === 'R') {
+                    removalReasonDiv.style.display = "block";
+                }
+                else {
+                    removalReasonDiv.style.display = "none";
+                }
+            }));
+
+
             while (markupSelectObj.lastChild) {
                 markupSelectObj.removeChild(markupSelectObj.lastChild);
             }
 
-            return this.queryLayer(
-                layerObj.URL,
-                "ecoshapeid=" + data.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
-                ['presence'],
-                function (results) {
-                    let pDict = {
-                        P: "Present",
-                        X: "Presence Expected",
-                        H: "Historical",
-                        R: "Remove"
-                    };
+            let pDict = { P: "Present", X: "Presence Expected", H: "Historical", R: "Remove" };
 
-                    let presence = results.features.length != 0 ? results.features[0].attributes['presence'] : null;
+            domConstruct.create("option", {
+                innerHTML: "None Set",
+                selected: "",
+                disabled: "",
+                value: ""
+            }, markupSelectObj);
 
+            if (selectedFeatures.length == 1) {
+                let presence = speciesRangeEcoshapes.length != 0 ? speciesRangeEcoshapes[0].presence : null;
+                for (let key in pDict) {
+                    if (presence && (presence === key || presence === "R")) continue;
+                    if (!presence && key === "R") continue;
                     domConstruct.create("option", {
-                        innerHTML: "None Set",
-                        selected: "",
-                        disabled: "",
-                        value: ""
+                        innerHTML: pDict[key],
+                        value: key
                     }, markupSelectObj);
-
-                    for (let key in pDict) {
-                        if (presence && (presence === key || presence === "R")) continue;
-                        if (!presence && key === "R") continue;
-                        domConstruct.create("option", {
-                            innerHTML: pDict[key],
-                            value: key
-                        }, markupSelectObj);
-                    }
-
-                    on(markupSelectObj, "change", lang.hitch(this, function () {
-                        let removalReasonDiv = dom.byId("removalReasonDiv");
-                        let removalReasonBr = dom.byId("removalReasonBr");
-                        if (markupSelectObj.value === 'R') {
-                            removalReasonDiv.style.display = "block";
-                            removalReasonBr.style.display = "block";
-                        }
-                        else {
-                            removalReasonDiv.style.display = "none";
-                            removalReasonBr.style.display = "none";
-                        }
-                    }));
                 }
-            )
+
+                let selectElem = document.getElementById('markupSelect');
+                this.queryLayer(
+                    ECOSHAPE_REVIEW_URL,
+                    "ecoshapeid=" + selectedFeatures[0].ecoshapeid + " and reviewid=" + reviewID,
+                    ['reference', 'ecoshapereviewnotes', 'markup', 'removalreason'],
+                    lang.hitch(this, function (results) {
+                        if (Array.isArray(results.features) && results.features.length != 0) {
+                            let attr = results.features[0].attributes;
+                            dom.byId("comment").value = attr['ecoshapereviewnotes'];
+                            dom.byId("reference").value = attr['reference'];
+
+                            selectElem.value = attr['markup'];
+                            if (attr['markup'] == 'R') {
+                                dom.byId("removalReason").value = attr['removalreason'];
+                                dom.byId("removalReasonDiv").style.display = "block";
+                            }
+                        }
+                    })
+                );
+
+            }
+            else {
+                let isRangePresent = speciesRangeEcoshapes.length == 0? false: true;
+                for (let key in pDict) {
+                    if (!isRangePresent && key === "R") continue;
+                    domConstruct.create("option", {
+                        innerHTML: pDict[key],
+                        value: key
+                    }, markupSelectObj);
+                }
+
+            }
         },
-        setEcoshapeInfo: function (layerObj, feature, ecoshapeSpecies, parentObj) {
+        setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata) {
             dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
             dom.byId("ecozone").innerHTML = feature.ecozone;
             dom.byId("terrestrialArea").innerHTML = `${Math.round((feature.terrestrialarea / 1000000) * 100) / 100} km<sup>2</sup>`;
             dom.byId("ecoshapeName").innerHTML = feature.ecoshapename;
-            dom.byId("ecoshapeSpecies").innerHTML = ecoshapeSpecies;
+            dom.byId("ecoshapeSpecies").innerHTML = dom.byId('speciesSelect').value;
             dom.byId("terrestrialProportion").innerHTML = `${Math.round(feature.terrestrialproportion * 100 * 10) / 10}%`;
-            this.queryLayer(
-                layerObj.URL,
-                "ecoshapeid=" + feature.ecoshapeid + " and rangemapid=" + parentObj.dataModel.rangeMapID,
-                ['presence'],
-                function (results) {
-                    if (results.features.length != 0) {
-                        let presence = results.features[0].attributes.presence;
-                        dom.byId("ecoshapePresence").innerHTML = presence === "P" ? "Present" : presence === "H" ? "Historical" : "Presence Expected";
-                        dom.byId("ecoshapeMetadata").innerHTML = parentObj.rangeMetadata.innerHTML;
-                    }
-                    else {
-                        dom.byId("ecoshapePresence").innerHTML = "";
-                        dom.byId("ecoshapeMetadata").innerHTML = "";
-                    }
-                }
-            )
+            if (speciesRangeEcoshapes.length != 0) {
+                let presence = speciesRangeEcoshapes[0].presence; //CheckLater
+                dom.byId("ecoshapePresence").innerHTML = presence === "P" ? "Present" : presence === "H" ? "Historical" : "Presence Expected";
+                dom.byId("ecoshapeMetadata").innerHTML = ecoshapeMetadata;
+            }
+            else {
+                dom.byId("ecoshapePresence").innerHTML = "";
+                dom.byId("ecoshapeMetadata").innerHTML = "";
+            }
         },
         setUserTaxaSpecies: function (username, widgetObj) {
             this.queryLayer(
@@ -275,12 +287,21 @@ define([
             });
         },
 
-        clearSelectionByLayer(layerTitle) {
+        clearSelectionByLayer: function (layerTitle) {
             let layerStructure = LayerStructure.getInstance();
             layerStructure.traversal(function (layerNode) {
                 if (layerNode.title === layerTitle)
                     layerNode.getLayerObject().then((layer) => layer.clearSelection());
             });
+        },
+        fetchReviewedEcoshapes: function (url, where) {
+            return this.queryLayer(url, where, ['*'])
+                .then((results) => {
+                    let temp = [];
+                    if (results.features.length != 0)
+                        results.features.forEach(x => temp.push(x.attributes));
+                    return temp;
+                });
         },
         _onSearchError: function (error) {
             console.error(error);
