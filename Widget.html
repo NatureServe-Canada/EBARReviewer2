@@ -71,7 +71,10 @@
                 </div>
             </div>
             <div id="no_info_pane">
-                <h3>Multiple Ecoshapes selected</h3>
+                <h2>Multiple Ecoshapes selected</h2>
+                <p><b>WARNING:</b> Existing markup for the selected Ecoshapes will be replaced on save</p>
+                <p id="markup_warning" style="display: none"><b>WARNING:</b> Chosen markup will only be applied to
+                    relevant Ecoshapes</p>
             </div>
         </div>
         <br>
@@ -108,7 +111,8 @@
             <div>
                 <span>
                     <button class="esri-button" id="backButton">Back</button>
-                    <span id="deleteMarkupSpan" style="display:none"><button class="esri-button" id="deleteMarkup">Delete
+                    <span id="deleteMarkupSpan" style="display:none"><button class="esri-button"
+                            id="deleteMarkup">Delete
                             Markup</button></span>
                     <button class="esri-button" id="saveButton">Save</button>
                 </span>

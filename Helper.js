@@ -17,7 +17,9 @@ define([
             var queryTask = new QueryTask(url);
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
+
         setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, ECOSHAPE_REVIEW_URL, reviewID) {
+            dom.byId("markup_warning").style.display = "none";
             let markupSelectObj = dom.byId("markupSelect");
             on(markupSelectObj, "change", lang.hitch(this, function () {
                 let removalReasonDiv = dom.byId("removalReasonDiv");
@@ -76,9 +78,21 @@ define([
 
             }
             else {
-                let isRangePresent = speciesRangeEcoshapes.length == 0? false: true;
+                let isRangePresent = false;
+                let optionToSkip = null;
+                if (speciesRangeEcoshapes.length != 0) {
+                    isRangePresent = true;
+                    dom.byId("markup_warning").style.display = "block";
+                    if (speciesRangeEcoshapes.length == selectedFeatures.length) {
+                        let temp = speciesRangeEcoshapes.map(x => x.presence);
+                        if (temp.every(v => v === temp[0])) optionToSkip = temp[0];
+                        dom.byId("markup_warning").style.display = "none";
+                    }
+                }
+                // let isRangePresent = speciesRangeEcoshapes.length == 0 ? false : true;
                 for (let key in pDict) {
                     if (!isRangePresent && key === "R") continue;
+                    if(key === optionToSkip) continue;
                     domConstruct.create("option", {
                         innerHTML: pDict[key],
                         value: key
@@ -87,6 +101,7 @@ define([
 
             }
         },
+
         setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata) {
             dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
             dom.byId("ecozone").innerHTML = feature.ecozone;
@@ -104,6 +119,7 @@ define([
                 dom.byId("ecoshapeMetadata").innerHTML = "";
             }
         },
+
         setUserTaxaSpecies: function (username, widgetObj) {
             this.queryLayer(
                 widgetObj.config.layers.REVIEW_RANGEMAP_SPECIES.URL,
@@ -250,6 +266,7 @@ define([
                 dom.byId("overallFeedbackButton").disabled = false;
             }));
         },
+
         mapReviewEcoshapeIDs: function (url, dict) {
             this.queryLayer(
                 url,
@@ -275,18 +292,6 @@ define([
             });
         },
 
-        getObjectID: function (url, reviewID, ecoshapeID) {
-            return this.queryLayer(
-                url,
-                "reviewid=" + reviewID + " and ecoshapeid=" + ecoshapeID,
-                ["objectid"],
-                null
-            ).then((results) => {
-                let featureAttributes = results.features[0].attributes;
-                return featureAttributes['objectid'];
-            });
-        },
-
         clearSelectionByLayer: function (layerTitle) {
             let layerStructure = LayerStructure.getInstance();
             layerStructure.traversal(function (layerNode) {
@@ -294,6 +299,7 @@ define([
                     layerNode.getLayerObject().then((layer) => layer.clearSelection());
             });
         },
+
         fetchReviewedEcoshapes: function (url, where) {
             return this.queryLayer(url, where, ['*'])
                 .then((results) => {
@@ -303,6 +309,7 @@ define([
                     return temp;
                 });
         },
+
         _onSearchError: function (error) {
             console.error(error);
         },
