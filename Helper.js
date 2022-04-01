@@ -7,7 +7,9 @@ define([
     'esri/tasks/query',
     'esri/tasks/QueryTask',
     'jimu/LayerStructure',
-], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure) {
+    'esri/layers/FeatureLayer',
+    'esri/graphic',
+], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure, FeatureLayer, graphic) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method = null) {
             var queryParams = new Query();
@@ -228,32 +230,43 @@ define([
                     }
                 }));
 
+                let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
                 var queryParams = new Query();
                 queryParams.returnGeometry = false;
                 queryParams.where = "reviewid=" + reviewID + " and rangeMapID=" + rangeMapID;
                 queryParams.outFields = ["*"];
-                var queryTask = new QueryTask(this.config.layers.REVIEW.URL);
-                queryTask.execute(queryParams, lang.hitch(this, (results) => {
-                    if (results.features.length != 0) {
-                        this.dataModel.overallReviewObjectID = results.features[0].attributes['objectid'];
-                        this.dataModel.overallReviewRating = results.features[0].attributes['overallstarrating'];
-                        this.dataModel.overallReviewComment = results.features[0].attributes['reviewnotes'];
-                        if (results.features[0].attributes['datecompleted']) {
-                            dom.byId("review_submitted").style.display = "block";
-                            dom.byId("saveButton").disabled = true;
-                            dom.byId("SaveOverallFeedbackButton").disabled = true;
-                            dom.byId("SubmitOverallFeedbackButton").disabled = true;
-                            dom.byId("deleteMarkup").disabled = true;
+                reviewLayer.queryFeatures(queryParams)
+                    .then((results) => {
+                        if (results.features.length != 0) {
+                            this.dataModel.overallReviewObjectID = results.features[0].attributes['objectid'];
+                            this.dataModel.overallReviewRating = results.features[0].attributes['overallstarrating'];
+                            this.dataModel.overallReviewComment = results.features[0].attributes['reviewnotes'];
+                            if (!results.features[0].attributes['datestarted']) {
+                                let graphicObj = new graphic();
+                                graphicObj.setAttributes({
+                                    objectid: this.dataModel.overallReviewObjectID,
+                                    datestarted: new Date().getTime()
+                                });
+                                reviewLayer.applyEdits(null, [graphicObj]).then(() => {
+                                    console.log("datestarted updated")
+                                });
+                            }
+                            if (results.features[0].attributes['datecompleted']) {
+                                dom.byId("review_submitted").style.display = "block";
+                                dom.byId("saveButton").disabled = true;
+                                dom.byId("SaveOverallFeedbackButton").disabled = true;
+                                dom.byId("SubmitOverallFeedbackButton").disabled = true;
+                                dom.byId("deleteMarkup").disabled = true;
+                            }
+                            else {
+                                dom.byId("review_submitted").style.display = "none";
+                                dom.byId("saveButton").disabled = false;
+                                dom.byId("SaveOverallFeedbackButton").disabled = false;
+                                dom.byId("SubmitOverallFeedbackButton").disabled = false;
+                                dom.byId("deleteMarkup").disabled = false;
+                            }
                         }
-                        else {
-                            dom.byId("review_submitted").style.display = "none";
-                            dom.byId("saveButton").disabled = false;
-                            dom.byId("SaveOverallFeedbackButton").disabled = false;
-                            dom.byId("SubmitOverallFeedbackButton").disabled = false;
-                            dom.byId("deleteMarkup").disabled = false;
-                        }
-                    }
-                }));
+                    });
 
                 dom.byId("overallFeedbackButton").disabled = false;
             }));
