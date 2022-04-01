@@ -18,7 +18,7 @@ define([
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
 
-        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, ECOSHAPE_REVIEW_URL, reviewID) {
+        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes) {
             dom.byId("markup_warning").style.display = "none";
             let markupSelectObj = dom.byId("markupSelect");
             on(markupSelectObj, "change", lang.hitch(this, function () {
@@ -57,25 +57,17 @@ define([
                 }
 
                 let selectElem = document.getElementById('markupSelect');
-                this.queryLayer(
-                    ECOSHAPE_REVIEW_URL,
-                    "ecoshapeid=" + selectedFeatures[0].ecoshapeid + " and reviewid=" + reviewID,
-                    ['reference', 'ecoshapereviewnotes', 'markup', 'removalreason'],
-                    lang.hitch(this, function (results) {
-                        if (Array.isArray(results.features) && results.features.length != 0) {
-                            let attr = results.features[0].attributes;
-                            dom.byId("comment").value = attr['ecoshapereviewnotes'];
-                            dom.byId("reference").value = attr['reference'];
+                if (reviewedEcoshapes.length != 0) {
+                    let attr = reviewedEcoshapes[0];
+                    dom.byId("comment").value = attr['ecoshapereviewnotes'];
+                    dom.byId("reference").value = attr['reference'];
 
-                            selectElem.value = attr['markup'];
-                            if (attr['markup'] == 'R') {
-                                dom.byId("removalReason").value = attr['removalreason'];
-                                dom.byId("removalReasonDiv").style.display = "block";
-                            }
-                        }
-                    })
-                );
-
+                    selectElem.value = attr['markup'];
+                    if (attr['markup'] == 'R') {
+                        dom.byId("removalReason").value = attr['removalreason'];
+                        dom.byId("removalReasonDiv").style.display = "block";
+                    }
+                }
             }
             else {
                 let isRangePresent = false;
@@ -92,7 +84,7 @@ define([
                 // let isRangePresent = speciesRangeEcoshapes.length == 0 ? false : true;
                 for (let key in pDict) {
                     if (!isRangePresent && key === "R") continue;
-                    if(key === optionToSkip) continue;
+                    if (key === optionToSkip) continue;
                     domConstruct.create("option", {
                         innerHTML: pDict[key],
                         value: key
