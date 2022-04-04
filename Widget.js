@@ -345,6 +345,7 @@ define([
                                 dom.byId("reference").value = "";
 
                                 dom.byId("removalReasonDiv").style.display = "none";
+                                dom.byId("removalReason").value = "";
 
                                 if (this.selectedFeatures.length == 1) {
                                     dom.byId("markup_info_pane").style.display = "block";
