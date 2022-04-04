@@ -40,6 +40,16 @@ define([
 
             this.dataModel = new DataModel();
 
+            on(dom.byId("markupSelect"), "change", function () {
+                let removalReasonDiv = dom.byId("removalReasonDiv");
+                if (dom.byId("markupSelect").value === 'R') {
+                    removalReasonDiv.style.display = "block";
+                }
+                else {
+                    removalReasonDiv.style.display = "none";
+                }
+            });
+
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 

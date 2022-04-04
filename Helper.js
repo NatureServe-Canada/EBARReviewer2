@@ -23,16 +23,6 @@ define([
         setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes) {
             dom.byId("markup_warning").style.display = "none";
             let markupSelectObj = dom.byId("markupSelect");
-            on(markupSelectObj, "change", lang.hitch(this, function () {
-                let removalReasonDiv = dom.byId("removalReasonDiv");
-                if (markupSelectObj.value === 'R') {
-                    removalReasonDiv.style.display = "block";
-                }
-                else {
-                    removalReasonDiv.style.display = "none";
-                }
-            }));
-
 
             while (markupSelectObj.lastChild) {
                 markupSelectObj.removeChild(markupSelectObj.lastChild);
