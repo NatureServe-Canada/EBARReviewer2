@@ -131,9 +131,6 @@ define([
             }));
 
             on(dom.byId('backButton'), "click", lang.hitch(this, function (e) {
-                dom.byId("markupPanel").style.display = "none";
-                dom.byId("infoPanel").style.display = "block";
-
                 helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
 
@@ -165,9 +162,6 @@ define([
                             });
                         }
                     });
-
-                dom.byId("markupPanel").style.display = "none";
-                dom.byId("infoPanel").style.display = "block";
 
                 helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
             }));
@@ -260,10 +254,6 @@ define([
 
                 all(editResponses).then(lang.hitch(this, function (results) {
                     helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
-
-                    dom.byId("markupPanel").style.display = "none";
-                    dom.byId("infoPanel").style.display = "block";
-
                     helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
                 }));
 
@@ -366,6 +356,12 @@ define([
 
                                 dom.byId("markupPanel").style.display = "block";
                             }));
+                        }));
+
+                        layer.on("selection-clear", lang.hitch(this, function (val) {
+                            dom.byId("markupPanel").style.display = "none";
+                            dom.byId("overallFeedbackDiv").style.display = "none";
+                            dom.byId("infoPanel").style.display = "block";
                         }));
                     }));
                 }
