@@ -1,5 +1,43 @@
 ﻿define({
-    root:({
-        
-    }) 
+    root: ({
+        selectTaxa: "Select Taxa",
+        selectSpecies: "Select Species",
+        reviewSubmitted: "REVIEW SUBMITTED, additional markup and feedback for this range map are not allowed.",
+        rangeVersion: "Range Version",
+        rangeStage: "Stage",
+        rangeScope: "Range Map Scope",
+        speciesInformation: "Species Information",
+        metadata: "Metadata",
+        overallFeedback: "Overall Feedback",
+        ecoshapeName: "Ecoshape",
+        parentEcoregion: "Parent Ecoregion",
+        ecozone: "Ecozone",
+        terrestrialArea: "Terrestrial Area",
+        terrestrialProportion: "Terrestrial Proportion",
+        ecoshapePresence: "Presence",
+        ecoshapeSpecies: "Species",
+        multipleEcoshapes: "Multiple Ecoshapes selected",
+        warning: "WARNING",
+        warning1: "Existing markup for the selected Ecoshapes will be replaced on save",
+        warning2: "Chosen markup will only be applied to relevant Ecoshapes",
+        required: "required",
+        markup: "Markup",
+        removalReason: "Removal Reason",
+        removalReason1: "Presumed Extirpated",
+        removalReason2: "Never Was There",
+        removalReason3: "Reported But False",
+        removalReason4: "Transient/Vagrant",
+        removalReason5: "Other",
+        noneSet: "None set",
+        comment: "Comment",
+        reference: "Reference",
+        backButton: "Back",
+        deleteMarkupButton: "Delete Markup",
+        saveButton: "Save",
+        SubmitButton: "Submit",
+        provideFeedBack: "Please provide overall range feedback",
+        starRating: "Star Rating",
+        overallComment: "Overall comment"
+    }),
+    "fr": 1
 });
