@@ -338,6 +338,7 @@ define([
                                 }
 
                                 dom.byId("infoPanel").style.display = "none";
+                                dom.byId("overallFeedbackDiv").style.display = "none";
                                 dom.byId("markup_info_pane").style.display = "none";
                                 dom.byId("no_info_pane").style.display = "none";
 
@@ -377,6 +378,20 @@ define([
                     }));
                 }
             }));
+        },
+
+        onOpen: function () {
+            var panel = this.getPanel();
+            panel.position.width = 325;
+            // panel.position.height = 300;
+            panel._originalBox = {
+                w: panel.position.width,
+                h: panel.position.height,
+                l: panel.position.left || 0,
+                t: panel.position.top || 0
+            };
+            panel.setPosition(panel.position);
+            panel.panelManager.normalizePanel(panel);
         },
 
         onSignIn: function (credential) {

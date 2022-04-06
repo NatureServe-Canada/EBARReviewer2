@@ -1,16 +1,16 @@
 <div>
     <div id="infoPanel">
         <div>
-            <label><b>Select Taxa</b></label>
-            <select id="taxaSelect" style="min-width: 200px;"></select>
+            <!-- <label><b>Select Taxa</b></label> -->
+            <select id="taxaSelect"></select>
         </div>
         <div>
-            <label><b>Select Species</b></label>
-            <select id="speciesSelect" style="min-width: 200px;"></select>
+            <!-- <label><b>Select Species</b></label> -->
+            <select id="speciesSelect" disabled></select>
         </div>
         <div style="display: none;" id="review_submitted">
-            <span style="color:lightpink">REVIEW SUBMITTED, additional markup and feedback for this range map are not
-                allowed.</span>
+            <span ><strong>REVIEW SUBMITTED, additional markup and feedback for this range map are not
+                allowed.</strong></span>
         </div>
         <div>
             <span><b>Range Version:</b></span>
@@ -39,7 +39,7 @@
     <div id="markupPanel" style="display: none">
         <div>
             <div id="markup_info_pane">
-                <h1>Ecoshape: <span id="ecoshapeName"></span></h1>
+                <p class="panel_heading">Ecoshape: <span id="ecoshapeName"></span></p>
                 <hr>
                 <div>
                     <span><b>Parent Ecoregion:</b></span>
@@ -71,22 +71,22 @@
                 </div>
             </div>
             <div id="no_info_pane">
-                <h2>Multiple Ecoshapes selected</h2>
-                <p><b>WARNING:</b> Existing markup for the selected Ecoshapes will be replaced on save</p>
-                <p id="markup_warning" style="display: none"><b>WARNING:</b> Chosen markup will only be applied to
+                <p class="panel_heading">Multiple Ecoshapes selected</p>
+                <p><strong>WARNING:</strong> Existing markup for the selected Ecoshapes will be replaced on save</p>
+                <p id="markup_warning" style="display: none"><strong>WARNING:</strong> Chosen markup will only be applied to
                     relevant Ecoshapes</p>
             </div>
         </div>
         <br>
         <div id="markup_form">
             <div>
-                <span>Markup (required):</span>
+                <span><b>Markup (required):</b></span>
                 <select id="markupSelect" required></select>
             </div>
-            <br>
+            <!-- <br> -->
             <div id='removalReasonDiv' style="display:none">
                 <div>
-                    <label for="removalReason">Removal Reason (required):</label><br>
+                    <label for="removalReason"><b>Removal Reason (required):</b></label><br>
                     <select id="removalReason">
                         <option disabled="" selected="" value="">None set</option>
                         <option value="X">Presumed Extirpated</option>
@@ -96,15 +96,15 @@
                         <option value="O">Other</option>
                     </select>
                 </div>
-                <br>
+                <!-- <br> -->
             </div>
             <div>
-                <label for="comment">Comment (required):</label><br>
+                <label for="comment"><b>Comment (required):</b></label><br>
                 <textarea id="comment" name="comment" rows="4" cols="30"></textarea>
             </div>
-            <br>
+            <!-- <br> -->
             <div>
-                <label for="reference">Reference:</label><br>
+                <label for="reference"><b>Reference:</b></label><br>
                 <textarea id="reference" name="reference" rows="4" cols="30"></textarea>
             </div>
             <br>
@@ -121,7 +121,7 @@
     </div>
     <div id="overallFeedbackDiv" style="display:none">
         <div id="overallFeedback">
-            <h4>Please provide overall range feedback</h4><br>
+            <p class="panel_heading">Overall range feedback</p>
             <b>Star Rating:</b>
             <div>
                 <input type="radio" name="rating" id="radio1" value="1" /> <label for="radio1">One</label>

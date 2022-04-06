@@ -138,7 +138,7 @@ define([
 
             let taxaSelect = dom.byId("taxaSelect");
             domConstruct.create("option", {
-                innerHTML: "None Set",
+                innerHTML: "Select Taxa",
                 selected: "",
                 disabled: "",
                 value: ""
@@ -151,13 +151,20 @@ define([
             });
 
             let speciesSelect = dom.byId("speciesSelect");
+            domConstruct.create("option", {
+                innerHTML: "Select Species",
+                selected: "",
+                disabled: "",
+                value: ""
+            }, speciesSelect);
+
             on(taxaSelect, "change", lang.hitch(this, function () {
                 while (speciesSelect.lastChild) {
                     speciesSelect.removeChild(speciesSelect.lastChild);
                 }
 
                 domConstruct.create("option", {
-                    innerHTML: "None Set",
+                    innerHTML: "Select Species",
                     selected: "",
                     disabled: "",
                     value: ""
@@ -171,6 +178,8 @@ define([
                         }, speciesSelect);
                     }
                 }
+
+                speciesSelect.disabled = false;
             }));
 
             let rangeMapID = null;
