@@ -9,7 +9,8 @@ define([
     'jimu/LayerStructure',
     'esri/layers/FeatureLayer',
     'esri/graphic',
-], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure, FeatureLayer, graphic) {
+    'dojo/promise/all',
+], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure, FeatureLayer, graphic, all) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method = null) {
             var queryParams = new Query();
@@ -206,26 +207,17 @@ define([
 
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(lang.hitch(this, function (layerNode) {
+                    let promise = null;
                     if (layerNode.title === this.config.layers.SPECIES_RANGE_ECOSHAPES.title) {
-                        layerNode.getLayerObject().then(lang.hitch(this, (layer) => {
-                            layer.setDefinitionExpression("rangemapid=" + rangeMapID);
-
-                            let query = new Query();
-                            query.outFields = ["*"];
-                            layer.queryExtent(query, lang.hitch(this, function (e, count) {
-                                this.map.setExtent(e.extent);
-                            }));
-                        }));
+                        layerNode.setFilter("rangemapid=" + rangeMapID);
+                        layerNode.getExtent().then(extent => this.map.setExtent(extent, true));
                     }
                     else if (layerNode.title === this.config.layers.REVIEWED_ECOSHAPES.title) {
-                        layerNode.getLayerObject().then((layer) => {
-                            layer.setDefinitionExpression("reviewid=" + reviewID);
-                        });
+                        layerNode.setFilter("reviewid=" + reviewID);
+                        promise = layerNode.getExtent();
                     }
                     else if (layerNode.title === "Species Range Input") {
-                        layerNode.getLayerObject().then((layer) => {
-                            layer.setDefinitionExpression("rangemapid=" + rangeMapID);
-                        });
+                        layerNode.setFilter("rangemapid=" + rangeMapID);
                     }
                 }));
 
