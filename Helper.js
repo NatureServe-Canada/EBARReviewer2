@@ -204,12 +204,13 @@ define([
                 this.dataModel.reviewID = reviewID;
                 this.dataModel.rangeMapID = rangeMapID;
 
+                let extentArr = [];
                 let layerStructure = LayerStructure.getInstance();
                 layerStructure.traversal(lang.hitch(this, function (layerNode) {
                     let promise = null;
                     if (layerNode.title === this.config.layers.SPECIES_RANGE_ECOSHAPES.title) {
                         layerNode.setFilter("rangemapid=" + rangeMapID);
-                        layerNode.getExtent().then(extent => this.map.setExtent(extent, true));
+                        promise = layerNode.getExtent();
                     }
                     else if (layerNode.title === this.config.layers.REVIEWED_ECOSHAPES.title) {
                         layerNode.setFilter("reviewid=" + reviewID);
@@ -217,6 +218,20 @@ define([
                     }
                     else if (layerNode.title === "Species Range Input") {
                         layerNode.setFilter("rangemapid=" + rangeMapID);
+                    }
+
+                    if (promise) {
+                        promise.then(extent => {
+                            extentArr.push(extent);
+                            if (extentArr.length == 2) {
+                                if (isNaN(extentArr[0].xmax))
+                                    this.map.setExtent(extentArr[1], true);
+                                else if (isNaN(extentArr[1].xmax))
+                                    this.map.setExtent(extentArr[0], true);
+                                else
+                                    this.map.setExtent(extentArr[0].union(extentArr[1]), true);
+                            }
+                        });
                     }
                 }));
 
