@@ -53,24 +53,25 @@ define([
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
-                let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
                 for (var i = 0; i < radioButtons.length; i++) {
                     if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
-                        starRating = parseInt(radioButtons[i].value);
+                        this.dataModel.overallReviewRating = parseInt(radioButtons[i].value);
                     }
                 }
 
-                if (!starRating) {
+                if (!this.dataModel.overallReviewRating) {
                     alert("please provide a star rating");
                     return;
                 }
+
+                this.dataModel.overallReviewComment = dom.byId("overallComment").value;
 
                 let graphicObj = new graphic();
                 graphicObj.setAttributes({
                     objectid: this.dataModel.overallReviewObjectID,
                     reviewnotes: dom.byId("overallComment").value,
-                    overallstarrating: starRating,
+                    overallstarrating: this.dataModel.overallReviewRating,
                     datecompleted: new Date().getTime()
                 });
 
@@ -92,25 +93,26 @@ define([
             on(dom.byId("SaveOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
-                let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
                 for (var i = 0; i < radioButtons.length; i++) {
                     if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
-                        starRating = parseInt(radioButtons[i].value);
+                        this.dataModel.overallReviewRating = parseInt(radioButtons[i].value);
                     }
                 }
 
-                if (!starRating) {
+                if (!this.dataModel.overallReviewRating) {
                     alert("please provide a star rating");
                     return;
                 }
+
+                this.dataModel.overallReviewComment = dom.byId("overallComment").value;
 
                 if (this.dataModel.overallReviewObjectID) {
                     let graphicObj = new graphic();
                     graphicObj.setAttributes({
                         objectid: this.dataModel.overallReviewObjectID,
                         reviewnotes: dom.byId("overallComment").value,
-                        overallstarrating: starRating
+                        overallstarrating: this.dataModel.overallReviewRating
                     });
 
                     reviewLayer.applyEdits(null, [graphicObj]).then(() => {
