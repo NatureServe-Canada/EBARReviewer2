@@ -132,7 +132,7 @@ define([
                 dom.byId("infoPanel").style.display = "none";
 
                 if (this.dataModel.overallReviewRating) {
-                    dom.byId("radio" + this.dataModel.overallReviewRating).checked = true;
+                    dom.byId("rating-" + this.dataModel.overallReviewRating).checked = true;
                     if (this.dataModel.overallReviewComment)
                         dom.byId("overallComment").value = this.dataModel.overallReviewComment;
                 }
