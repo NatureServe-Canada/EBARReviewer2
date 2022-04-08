@@ -77,7 +77,11 @@ define([
                 reviewLayer.applyEdits(null, [graphicObj]).then(() => {
                     dom.byId("overallFeedbackDiv").style.display = "none";
                     dom.byId("infoPanel").style.display = "block";
-                    dom.byId("review_submitted").style.display = "block";
+                    dom.byId("markup_warnings").style.display = "none";
+                    const collection = document.getElementsByClassName("review_submitted");
+                    for (let i = 0; i < collection.length; i++) {
+                        collection[i].style.display = "block";
+                    }
                     dom.byId("saveButton").disabled = true;
                     dom.byId("SaveOverallFeedbackButton").disabled = true;
                     dom.byId("SubmitOverallFeedbackButton").disabled = true;

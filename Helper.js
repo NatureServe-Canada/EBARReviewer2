@@ -74,7 +74,6 @@ define([
                         dom.byId("markup_warning").style.display = "none";
                     }
                 }
-                // let isRangePresent = speciesRangeEcoshapes.length == 0 ? false : true;
                 for (let key in pDict) {
                     if (!isRangePresent && key === "R") continue;
                     if (key === optionToSkip) continue;
@@ -243,14 +242,22 @@ define([
                                 });
                             }
                             if (results.features[0].attributes['datecompleted']) {
-                                dom.byId("review_submitted").style.display = "block";
+                                dom.byId("markup_warnings").style.display = "none";
+                                const collection = document.getElementsByClassName("review_submitted");
+                                for (let i = 0; i < collection.length; i++) {
+                                    collection[i].style.display = "block";
+                                }
                                 dom.byId("saveButton").disabled = true;
                                 dom.byId("SaveOverallFeedbackButton").disabled = true;
                                 dom.byId("SubmitOverallFeedbackButton").disabled = true;
                                 dom.byId("deleteMarkup").disabled = true;
                             }
                             else {
-                                dom.byId("review_submitted").style.display = "none";
+                                dom.byId("markup_warnings").style.display = "block";
+                                const collection = document.getElementsByClassName("review_submitted");
+                                for (let i = 0; i < collection.length; i++) {
+                                    collection[i].style.display = "none";
+                                }
                                 dom.byId("saveButton").disabled = false;
                                 dom.byId("SaveOverallFeedbackButton").disabled = false;
                                 dom.byId("SubmitOverallFeedbackButton").disabled = false;

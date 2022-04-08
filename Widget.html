@@ -6,9 +6,9 @@
         <div>
             <select id="speciesSelect" disabled></select>
         </div>
-        <div style="display: none;" id="review_submitted">
-            <span ><strong>REVIEW SUBMITTED, additional markup and feedback for this range map are not
-                allowed.</strong></span>
+        <div style="display: none;" class="review_submitted">
+            <span><strong>REVIEW SUBMITTED:</strong> Additional markup and feedback for this range map are not
+                allowed.</span>
         </div>
         <div>
             <span><b>Range Version:</b></span>
@@ -39,6 +39,10 @@
             <div id="markup_info_pane">
                 <p class="panel_heading">Ecoshape: <span id="ecoshapeName"></span></p>
                 <hr>
+                <div style="display: none;" class="review_submitted">
+                    <span><strong>REVIEW SUBMITTED:</strong> Additional markup for this range map is not
+                        allowed.</span>
+                </div>
                 <div>
                     <span><b>Parent Ecoregion:</b></span>
                     <span id='parentEcoregion'></span>
@@ -70,9 +74,16 @@
             </div>
             <div id="no_info_pane">
                 <p class="panel_heading">Multiple Ecoshapes selected</p>
-                <p><strong>WARNING:</strong> Existing markup for the selected Ecoshapes will be replaced on save</p>
-                <p id="markup_warning" style="display: none"><strong>WARNING:</strong> Chosen markup will only be applied to
-                    relevant Ecoshapes</p>
+                <hr>
+                <div style="display: none;" class="review_submitted">
+                    <span><strong>REVIEW SUBMITTED:</strong> Additional markup for this range map is not
+                        allowed.</span>
+                </div>
+                <div id="markup_warnings">
+                    <p><strong>WARNING:</strong> Existing markup for the selected Ecoshapes will be replaced on save.</p>
+                    <p id="markup_warning" style="display: none"><strong>WARNING:</strong> Chosen markup will only be
+                        applied to relevant Ecoshapes.</p>
+                </div>
             </div>
         </div>
         <br>
@@ -117,23 +128,27 @@
     <div id="overallFeedbackDiv" style="display:none">
         <div id="overallFeedback">
             <p class="panel_heading">Overall range feedback</p>
+            <hr>
+            <div style="display: none;" class="review_submitted">
+                <span><strong>REVIEW SUBMITTED:</strong> Additional feedback for this range map is not
+                    allowed.</span>
+            </div>
             <div>
-                <b>Rating:</b>
                 <fieldset>
-                  <span class="star-cb-group">
-                    <input type="radio" id="rating-5" name="rating" value="5" />
-                    <label for="rating-5">5</label>
-                    <input type="radio" id="rating-4" name="rating" value="4" />
-                    <label for="rating-4">4</label>
-                    <input type="radio" id="rating-3" name="rating" value="3" />
-                    <label for="rating-3">3</label>
-                    <input type="radio" id="rating-2" name="rating" value="2" />
-                    <label for="rating-2">2</label>
-                    <input type="radio" id="rating-1" name="rating" value="1" />
-                    <label for="rating-1">1</label>
-                    <input type="radio" id="rating-0" name="rating" value="0" class="star-cb-clear" />
-                    <label for="rating-0">0</label>
-                  </span>
+                    <span class="star-cb-group">
+                        <input type="radio" id="rating-5" name="rating" value="5" />
+                        <label for="rating-5">5</label>
+                        <input type="radio" id="rating-4" name="rating" value="4" />
+                        <label for="rating-4">4</label>
+                        <input type="radio" id="rating-3" name="rating" value="3" />
+                        <label for="rating-3">3</label>
+                        <input type="radio" id="rating-2" name="rating" value="2" />
+                        <label for="rating-2">2</label>
+                        <input type="radio" id="rating-1" name="rating" value="1" />
+                        <label for="rating-1">1</label>
+                        <input type="radio" id="rating-0" name="rating" value="0" class="star-cb-clear" />
+                        <label for="rating-0">0</label>
+                    </span>
                 </fieldset>
             </div>
             <div>
