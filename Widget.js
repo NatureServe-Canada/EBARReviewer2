@@ -48,6 +48,7 @@ define([
                 else {
                     removalReasonDiv.style.display = "none";
                 }
+                dom.byId("usage_type_select").disabled = false;
             });
 
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
@@ -333,10 +334,15 @@ define([
                                 speciesRangeEcoshapes: helper.fetchReviewedEcoshapes(
                                     this.config.layers.SPECIES_RANGE_ECOSHAPES.URL,
                                     "ecoshapeid in (" + ecoshapeIDs.toString() + ") and rangemapid=" + this.dataModel.rangeMapID
-                                )
+                                ),
+                                usageType: helper.fetchReviewedEcoshapes(
+                                    this.config.layers.USAGE_TYPE.URL,
+                                    "ecoshapeid in (" + ecoshapeIDs.toString() + ") and rangemapid=" + this.dataModel.rangeMapID
+                                ),
                             }).then(lang.hitch(this, function (results) {
                                 this.reviewedEcoshapes = results.reviewedEcoshapes;
                                 this.speciesRangeEcoshapes = results.speciesRangeEcoshapes;
+                                this.usageType = results.usageType.filter(x => x.usagetype);
 
                                 dom.byId("deleteMarkupSpan").style.display = "none";
                                 if (this.reviewedEcoshapes.length != 0) {
@@ -370,6 +376,8 @@ define([
                                     this.selectedFeatures,
                                     this.speciesRangeEcoshapes,
                                     this.reviewedEcoshapes,
+                                    this.usageType,
+                                    this.dataModel.differentiateusagetype
                                 );
 
                                 dom.byId("markupPanel").style.display = "block";

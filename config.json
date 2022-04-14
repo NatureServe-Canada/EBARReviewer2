@@ -5,7 +5,7 @@
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6"
         },
         "REVIEWED_ECOSHAPES": {
-            "title": "Reviewed Ecoshapes (generalized)",
+            "title": "Presence Markup",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11"
         },
         "SPECIES_RANGE_ECOSHAPES": {
@@ -23,6 +23,13 @@
         "REVIEW": {
             "title": "ReviewerApp2 - Review",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp/FeatureServer/4"
+        },
+        "USAGE_TYPE": {
+            "title": "Usage Type",
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/13"
+        },
+        "USAGE_TYPE_MARKUP": {
+            "title": "Usage Type Markup"
         }
     }
 }

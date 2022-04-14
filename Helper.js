@@ -21,32 +21,42 @@ define([
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
 
-        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes) {
+        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes, usageType, differentiateusagetype) {
             dom.byId("markup_warning").style.display = "none";
-            let markupSelectObj = dom.byId("markupSelect");
 
+            let markupSelectObj = dom.byId("markupSelect");
+            let pDict = { P: "Present", X: "Presence Expected", H: "Historical", R: "Remove" };
             while (markupSelectObj.lastChild) {
+                if (!markupSelectObj.lastChild.value) break;
                 markupSelectObj.removeChild(markupSelectObj.lastChild);
             }
 
-            let pDict = { P: "Present", X: "Presence Expected", H: "Historical", R: "Remove" };
-
-            domConstruct.create("option", {
-                innerHTML: "None Set",
-                selected: "",
-                disabled: "",
-                value: ""
-            }, markupSelectObj);
+            let usageTypeSelect = dom.byId("usage_type_select");
+            let uDict = { B: "Breeding", P: "Possible Breeding", M: "Migration", N: "Non-breeding" }
+            while (usageTypeSelect.lastChild) {
+                if (!usageTypeSelect.lastChild.value) break;
+                usageTypeSelect.removeChild(usageTypeSelect.lastChild);
+            }
 
             if (selectedFeatures.length == 1) {
                 let presence = speciesRangeEcoshapes.length != 0 ? speciesRangeEcoshapes[0].presence : null;
                 for (let key in pDict) {
-                    if (presence && (presence === key || presence === "R")) continue;
+                    if (presence && presence === key) continue;
                     if (!presence && key === "R") continue;
                     domConstruct.create("option", {
                         innerHTML: pDict[key],
                         value: key
                     }, markupSelectObj);
+                }
+
+                let usageTypeVal = usageType.length != 0 ? usageType[0].presence : null;
+                for (let key in uDict) {
+                    if (usageTypeVal && usageTypeVal === key) continue;
+                    if (!usageTypeVal && key === "N") continue;
+                    domConstruct.create("option", {
+                        innerHTML: uDict[key],
+                        value: key
+                    }, usageTypeSelect);
                 }
 
                 let selectElem = document.getElementById('markupSelect');
@@ -83,7 +93,43 @@ define([
                     }, markupSelectObj);
                 }
 
+                let isUsageTypeRangePresent = false;
+                let usageTypeToSkip = null;
+                if (usageType.length != 0) {
+                    isUsageTypeRangePresent = true;
+                    if (usageType.length == selectedFeatures.length) {
+                        let temp = usageType.map(x => x.usagetype);
+                        if (temp.every(v => v === temp[0])) usageTypeToSkip = temp[0];
+                    }
+                }
+
+                for (let key in uDict) {
+                    if (!isUsageTypeRangePresent && key === "N") continue;
+                    if (key === usageTypeToSkip) continue;
+                    domConstruct.create("option", {
+                        innerHTML: uDict[key],
+                        value: key
+                    }, usageTypeSelect);
+                }
             }
+
+            if (differentiateusagetype === 1) {
+                dom.byId("usage_type_div").style.display = "block";
+                if (speciesRangeEcoshapes.length != 0) {
+                    dom.byId("markup_required_annotation").style.display = "none";
+                    dom.byId("usage_type_select").disabled = false;
+                }
+                else {
+                    if (reviewedEcoshapes.length == 0) {
+                        dom.byId("markup_required_annotation").style.display = "inline";
+                        dom.byId("usage_type_select").disabled = true;
+                    }
+                    else {
+                        dom.byId("usage_type_select").disabled = false;
+                    }
+                }
+            }
+            else dom.byId("usage_type_div").style.display = "none";
         },
 
         setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata) {
@@ -108,7 +154,7 @@ define([
             this.queryLayer(
                 widgetObj.config.layers.REVIEW_RANGEMAP_SPECIES.URL,
                 `username = '${username}' and includeinebarreviewer=1`,
-                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME", "NSX_URL"],
+                ["Username", "ReviewID", "RangeMapID", "RangeVersion", "RangeStage", "RangeMetadata", "RangeMapNotes", "RangeMapScope", "TAX_GROUP", "NATIONAL_SCIENTIFIC_NAME", "NSX_URL", "DifferentiateUsageType"],
                 lang.hitch(widgetObj, this._setSpeciesDropdown)
             );
         },
@@ -198,6 +244,7 @@ define([
 
                         rangeMapID = featureAttributes['rangemapid'];
                         reviewID = featureAttributes['reviewid'];
+                        this.dataModel.differentiateusagetype = featureAttributes['differentiateusagetype'];
                     }
                 }
 
@@ -218,6 +265,20 @@ define([
                     }
                     else if (layerNode.title === "Species Range Input") {
                         layerNode.setFilter("rangemapid=" + rangeMapID);
+                    }
+                    else if (layerNode.title === this.config.layers.USAGE_TYPE.title) {
+                        if (this.dataModel.differentiateusagetype === 1) {
+                            layerNode.setFilter("rangemapid=" + rangeMapID);
+                            layerNode.show();
+                        }
+                        else layerNode.hide();
+                    }
+                    else if (layerNode.title === this.config.layers.USAGE_TYPE_MARKUP.title) {
+                        if (this.dataModel.differentiateusagetype === 1) {
+                            layerNode.setFilter("reviewid=" + reviewID);
+                            layerNode.show();
+                        }
+                        else layerNode.hide();
                     }
 
                     if (promise) {

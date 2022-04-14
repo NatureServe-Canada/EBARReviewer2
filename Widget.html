@@ -89,8 +89,16 @@
         <br>
         <div id="markup_form">
             <div>
-                <span><b>Markup (required):</b></span>
-                <select id="markupSelect" required></select>
+                <span><b>Markup <span id="markup_required_annotation">(required)</span>:</b></span>
+                <select id="markupSelect" required>
+                    <option disabled="" selected="" value="">None set</option>
+                </select>
+            </div>
+            <div id="usage_type_div" style="display:none">
+                <span><b>Usage Type :</b></span>
+                <select id="usage_type_select" required>
+                    <option disabled="" selected="" value="">None set</option>
+                </select>
             </div>
             <div id='removalReasonDiv' style="display:none">
                 <div>
