@@ -354,6 +354,8 @@ define([
                                 dom.byId("markup_info_pane").style.display = "none";
                                 dom.byId("no_info_pane").style.display = "none";
 
+                                dom.byId("markupSelect").value = "";
+                                dom.byId("usage_type_select").value = "";
                                 dom.byId("comment").value = "";
                                 dom.byId("reference").value = "";
 
