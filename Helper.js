@@ -132,7 +132,7 @@ define([
             else dom.byId("usage_type_div").style.display = "none";
         },
 
-        setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata) {
+        setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata, usageType) {
             dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
             dom.byId("ecozone").innerHTML = feature.ecozone;
             dom.byId("terrestrialArea").innerHTML = `${Math.round((feature.terrestrialarea / 1000000) * 100) / 100} km<sup>2</sup>`;
@@ -140,7 +140,7 @@ define([
             dom.byId("ecoshapeSpecies").innerHTML = dom.byId('speciesSelect').value;
             dom.byId("terrestrialProportion").innerHTML = `${Math.round(feature.terrestrialproportion * 100 * 10) / 10}%`;
             if (speciesRangeEcoshapes.length != 0) {
-                let presence = speciesRangeEcoshapes[0].presence; //CheckLater
+                let presence = speciesRangeEcoshapes[0].presence;
                 dom.byId("ecoshapePresence").innerHTML = presence === "P" ? "Present" : presence === "H" ? "Historical" : "Presence Expected";
                 dom.byId("ecoshapeMetadata").innerHTML = ecoshapeMetadata;
             }
@@ -148,6 +148,12 @@ define([
                 dom.byId("ecoshapePresence").innerHTML = "";
                 dom.byId("ecoshapeMetadata").innerHTML = "";
             }
+
+            if(usageType.length != 0) {
+                let usageTypeVal = usageType[0].usagetype;
+                dom.byId("ecoshapeUsageType").innerHTML = usageTypeVal === "B" ? "Breeding" : usageTypeVal === "P" ? "Possible Breeding" : "Migration";;
+            }
+            else dom.byId("ecoshapeUsageType").innerHTML = "";
         },
 
         setUserTaxaSpecies: function (username, widgetObj) {
