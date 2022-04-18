@@ -175,7 +175,8 @@ define([
                             objectIDs.forEach(x => graphicObjs.push(new graphic().setAttributes({ objectid: x })));
 
                             ecochapeReviewLayer.applyEdits(null, null, graphicObjs).then(() => {
-                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
+                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+                                helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                             });
                         }
                     });
