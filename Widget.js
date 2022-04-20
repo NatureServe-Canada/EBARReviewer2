@@ -44,11 +44,12 @@ define([
                 let removalReasonDiv = dom.byId("removalReasonDiv");
                 if (dom.byId("markupSelect").value === 'R') {
                     removalReasonDiv.style.display = "block";
+                    dom.byId("usage_type_select").disabled = true;
                 }
                 else {
                     removalReasonDiv.style.display = "none";
+                    dom.byId("usage_type_select").disabled = false;
                 }
-                dom.byId("usage_type_select").disabled = false;
             });
 
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {

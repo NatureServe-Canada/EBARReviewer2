@@ -24,6 +24,25 @@ define([
         setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes, usageType, differentiateusagetype) {
             dom.byId("markup_warning").style.display = "none";
 
+            if (differentiateusagetype === 1) {
+                dom.byId("usage_type_div").style.display = "block";
+                if (speciesRangeEcoshapes.length != 0) {
+                    dom.byId("markup_required_annotation").style.display = "none";
+                    dom.byId("usage_type_select").disabled = false;
+                }
+                else {
+                    if (reviewedEcoshapes.length == 0) {
+                        dom.byId("markup_required_annotation").style.display = "inline";
+                        dom.byId("usage_type_select").disabled = true;
+                    }
+                    else {
+                        dom.byId("usage_type_select").disabled = false;
+                    }
+                }
+            }
+            else dom.byId("usage_type_div").style.display = "none";
+
+
             let markupSelectObj = dom.byId("markupSelect");
             let pDict = { P: "Present", X: "Presence Expected", H: "Historical", R: "Remove" };
             while (markupSelectObj.lastChild) {
@@ -70,7 +89,9 @@ define([
                     if (attr['markup'] == 'R') {
                         dom.byId("removalReason").value = attr['removalreason'];
                         dom.byId("removalReasonDiv").style.display = "block";
+                        dom.byId("usage_type_select").disabled = true;
                     }
+                    else dom.byId("usage_type_select").disabled = false;
                 }
             }
             else {
@@ -113,24 +134,6 @@ define([
                     }, usageTypeSelect);
                 }
             }
-
-            if (differentiateusagetype === 1) {
-                dom.byId("usage_type_div").style.display = "block";
-                if (speciesRangeEcoshapes.length != 0) {
-                    dom.byId("markup_required_annotation").style.display = "none";
-                    dom.byId("usage_type_select").disabled = false;
-                }
-                else {
-                    if (reviewedEcoshapes.length == 0) {
-                        dom.byId("markup_required_annotation").style.display = "inline";
-                        dom.byId("usage_type_select").disabled = true;
-                    }
-                    else {
-                        dom.byId("usage_type_select").disabled = false;
-                    }
-                }
-            }
-            else dom.byId("usage_type_div").style.display = "none";
         },
 
         setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata, usageType) {
