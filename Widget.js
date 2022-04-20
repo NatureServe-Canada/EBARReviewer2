@@ -185,12 +185,21 @@ define([
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
-                if (!dom.byId("markupSelect").value) {
-                    alert("Please provide markup");
-                    return;
+                if (this.speciesRangeEcoshapes.length != 0) {
+                    if (!dom.byId("markupSelect").value && !dom.byId("usage_type_select").value) {
+                        alert("Please provide Presence or Usage Type markup");
+                        return;
+                    }
                 }
+                else {
+                    if (!dom.byId("markupSelect").value) {
+                        alert("Please provide Presence markup");
+                        return;
+                    }
+                }
+
                 if (!dom.byId("comment").value) {
-                    alert("Please provide markup comments");
+                    alert("Please provide markup comment");
                     return;
                 }
 
@@ -200,10 +209,14 @@ define([
                     reviewid: this.dataModel.reviewID,
                     ecoshapereviewnotes: dom.byId("comment").value,
                     username: this.userCredentials.userId,
-                    markup: dom.byId("markupSelect").value,
                     removalreason: null,
                     reference: dom.byId("reference").value
                 };
+
+                if (dom.byId("markupSelect").value) attributes.markup = dom.byId("markupSelect").value;
+                else attributes.markup = null;
+                if (dom.byId("usage_type_select").value) attributes.usagetypemarkup = dom.byId("usage_type_select").value;
+                else attributes.usagetypemarkup = null;
 
                 let removalReason = dom.byId("removalReason");
                 if (dom.byId("markupSelect").value === 'R') {
@@ -215,30 +228,61 @@ define([
                     }
                 }
 
-                let ecoshapeIDs = [], reviewedEcoshapeIDs = [], rangeMapEcoshapeIDs = [];
+                let ecoshapeIDs = [], reviewedEcoshapeIDs = [], rangeMapEcoshapeIDs = [], usageTypeEcoshapeIDs = [];
                 this.selectedFeatures.forEach(x => ecoshapeIDs.push(x.ecoshapeid));
                 this.reviewedEcoshapes.forEach(x => reviewedEcoshapeIDs.push(x.ecoshapeid));
                 this.speciesRangeEcoshapes.forEach(x => rangeMapEcoshapeIDs.push(x.ecoshapeid));
+                this.usageType.forEach(x => usageTypeEcoshapeIDs.push(x.ecoshapeid));
 
                 let editResponses = [];
                 if (this.reviewedEcoshapes.length != 0) {
                     let graphicObjs = [];
                     for (let i = 0; i < this.reviewedEcoshapes.length; i++) {
-                        if (dom.byId("markupSelect").value === 'R' &&
+                        let temp = JSON.parse(JSON.stringify(attributes));
+
+                        if (temp.markup === 'R' &&
                             rangeMapEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0)
                             continue;
 
                         let flag = false;
                         for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
                             if (this.reviewedEcoshapes[i].ecoshapeid === this.speciesRangeEcoshapes[j].ecoshapeid &&
-                                dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                temp.markup === this.speciesRangeEcoshapes[j].presence) {
                                 flag = true;
                                 break;
                             }
                         }
-                        if (flag) continue;
+                        if (flag && !temp.usagetypemarkup) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
 
-                        let temp = JSON.parse(JSON.stringify(attributes));
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
+
+                        if(temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
+                        flag = false;
+                        for (let j = 0; j < this.usageType.length; j++) {
+                            if (this.reviewedEcoshapes[i].ecoshapeid === this.usageType[j].ecoshapeid &&
+                                temp.usagetypemarkup === this.usageType[j].usagetype) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
+                        if (!temp.markup) delete temp.markup;
+                        if (!temp.usagetypemarkup) delete temp.usagetypemarkup;
                         temp.objectid = this.reviewedEcoshapes[i].objectid;
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
@@ -249,21 +293,44 @@ define([
                 if (insertecoshapeIDs.length != 0) {
                     let graphicObjs = [];
                     for (let i = 0; i < insertecoshapeIDs.length; i++) {
-                        if (dom.byId("markupSelect").value === 'R' &&
+                        let temp = JSON.parse(JSON.stringify(attributes));
+
+                        if ((temp.markup === 'R' || !temp.markup) &&
                             rangeMapEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0)
                             continue;
 
                         let flag = false;
                         for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
                             if (insertecoshapeIDs[i] === this.speciesRangeEcoshapes[j].ecoshapeid &&
-                                dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                temp.markup === this.speciesRangeEcoshapes[j].presence) {
                                 flag = true;
                                 break;
                             }
                         }
-                        if (flag) continue;
+                        if (flag) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
 
-                        let temp = JSON.parse(JSON.stringify(attributes));
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
+
+                        flag = false;
+                        for (let j = 0; j < this.usageType.length; j++) {
+                            if (insertecoshapeIDs[i] === this.usageType[j].ecoshapeid &&
+                                temp.usagetypemarkup === this.usageType[j].usagetype) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
                         temp.ecoshapeid = insertecoshapeIDs[i];
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
@@ -272,6 +339,7 @@ define([
 
                 all(editResponses).then(lang.hitch(this, function (results) {
                     helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+                    helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                     helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
                 }));
 

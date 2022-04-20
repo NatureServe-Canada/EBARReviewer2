@@ -29,7 +29,8 @@
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/13"
         },
         "USAGE_TYPE_MARKUP": {
-            "title": "Usage Type Markup"
+            "title": "Usage Type Markup",
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/14"
         }
     }
 }

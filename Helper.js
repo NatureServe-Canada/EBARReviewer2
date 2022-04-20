@@ -59,13 +59,14 @@ define([
                     }, usageTypeSelect);
                 }
 
-                let selectElem = document.getElementById('markupSelect');
+                // let selectElem = document.getElementById('markupSelect');
                 if (reviewedEcoshapes.length != 0) {
                     let attr = reviewedEcoshapes[0];
                     dom.byId("comment").value = attr['ecoshapereviewnotes'];
                     dom.byId("reference").value = attr['reference'];
 
-                    selectElem.value = attr['markup'];
+                    markupSelectObj.value = attr['markup'] ? attr['markup'] : "";
+                    usageTypeSelect.value = attr['usagetypemarkup'] ? attr['usagetypemarkup'] : "";
                     if (attr['markup'] == 'R') {
                         dom.byId("removalReason").value = attr['removalreason'];
                         dom.byId("removalReasonDiv").style.display = "block";
@@ -149,7 +150,7 @@ define([
                 dom.byId("ecoshapeMetadata").innerHTML = "";
             }
 
-            if(usageType.length != 0) {
+            if (usageType.length != 0) {
                 let usageTypeVal = usageType[0].usagetype;
                 dom.byId("ecoshapeUsageType").innerHTML = usageTypeVal === "B" ? "Breeding" : usageTypeVal === "P" ? "Possible Breeding" : "Migration";;
             }
@@ -266,7 +267,7 @@ define([
                         promise = layerNode.getExtent();
                     }
                     else if (layerNode.title === this.config.layers.REVIEWED_ECOSHAPES.title) {
-                        layerNode.setFilter("reviewid=" + reviewID);
+                        layerNode.setFilter("reviewid=" + reviewID + " and markup is not null");
                         promise = layerNode.getExtent();
                     }
                     else if (layerNode.title === "Species Range Input") {
