@@ -245,6 +245,11 @@ define([
                             rangeMapEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0)
                             continue;
 
+                        if (temp.markup === this.reviewedEcoshapes[i].markup) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
+
                         let flag = false;
                         for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
                             if (this.reviewedEcoshapes[i].ecoshapeid === this.speciesRangeEcoshapes[j].ecoshapeid &&
@@ -253,7 +258,7 @@ define([
                                 break;
                             }
                         }
-                        if (flag && !temp.usagetypemarkup) {
+                        if (flag) {
                             if (temp.usagetypemarkup) temp.markup = null;
                             else continue;
                         }
@@ -264,7 +269,7 @@ define([
                             else temp.usagetypemarkup = null;
                         }
 
-                        if(temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
+                        if (temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
                             if (temp.markup) temp.usagetypemarkup = null;
                             else continue;
                         }
