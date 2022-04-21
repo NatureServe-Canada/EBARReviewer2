@@ -44,40 +44,47 @@ define([
                 let removalReasonDiv = dom.byId("removalReasonDiv");
                 if (dom.byId("markupSelect").value === 'R') {
                     removalReasonDiv.style.display = "block";
+                    dom.byId("usage_type_select").disabled = true;
                 }
                 else {
                     removalReasonDiv.style.display = "none";
+                    dom.byId("usage_type_select").disabled = false;
                 }
             });
 
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
-                let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
                 for (var i = 0; i < radioButtons.length; i++) {
                     if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
-                        starRating = parseInt(radioButtons[i].value);
+                        this.dataModel.overallReviewRating = parseInt(radioButtons[i].value);
                     }
                 }
 
-                if (!starRating) {
+                if (!this.dataModel.overallReviewRating) {
                     alert("please provide a star rating");
                     return;
                 }
+
+                this.dataModel.overallReviewComment = dom.byId("overallComment").value;
 
                 let graphicObj = new graphic();
                 graphicObj.setAttributes({
                     objectid: this.dataModel.overallReviewObjectID,
                     reviewnotes: dom.byId("overallComment").value,
-                    overallstarrating: starRating,
+                    overallstarrating: this.dataModel.overallReviewRating,
                     datecompleted: new Date().getTime()
                 });
 
                 reviewLayer.applyEdits(null, [graphicObj]).then(() => {
                     dom.byId("overallFeedbackDiv").style.display = "none";
                     dom.byId("infoPanel").style.display = "block";
-                    dom.byId("review_submitted").style.display = "block";
+                    dom.byId("markup_warnings").style.display = "none";
+                    const collection = document.getElementsByClassName("review_submitted");
+                    for (let i = 0; i < collection.length; i++) {
+                        collection[i].style.display = "block";
+                    }
                     dom.byId("saveButton").disabled = true;
                     dom.byId("SaveOverallFeedbackButton").disabled = true;
                     dom.byId("SubmitOverallFeedbackButton").disabled = true;
@@ -88,25 +95,26 @@ define([
             on(dom.byId("SaveOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
-                let starRating = null;
                 let radioButtons = document.getElementsByName("rating");
                 for (var i = 0; i < radioButtons.length; i++) {
                     if (radioButtons[i].type === "radio" && radioButtons[i].checked == true) {
-                        starRating = parseInt(radioButtons[i].value);
+                        this.dataModel.overallReviewRating = parseInt(radioButtons[i].value);
                     }
                 }
 
-                if (!starRating) {
+                if (!this.dataModel.overallReviewRating) {
                     alert("please provide a star rating");
                     return;
                 }
+
+                this.dataModel.overallReviewComment = dom.byId("overallComment").value;
 
                 if (this.dataModel.overallReviewObjectID) {
                     let graphicObj = new graphic();
                     graphicObj.setAttributes({
                         objectid: this.dataModel.overallReviewObjectID,
                         reviewnotes: dom.byId("overallComment").value,
-                        overallstarrating: starRating
+                        overallstarrating: this.dataModel.overallReviewRating
                     });
 
                     reviewLayer.applyEdits(null, [graphicObj]).then(() => {
@@ -132,7 +140,7 @@ define([
                 dom.byId("infoPanel").style.display = "none";
 
                 if (this.dataModel.overallReviewRating) {
-                    dom.byId("radio" + this.dataModel.overallReviewRating).checked = true;
+                    dom.byId("rating-" + this.dataModel.overallReviewRating).checked = true;
                     if (this.dataModel.overallReviewComment)
                         dom.byId("overallComment").value = this.dataModel.overallReviewComment;
                 }
@@ -168,7 +176,8 @@ define([
                             objectIDs.forEach(x => graphicObjs.push(new graphic().setAttributes({ objectid: x })));
 
                             ecochapeReviewLayer.applyEdits(null, null, graphicObjs).then(() => {
-                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title)
+                                helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+                                helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                             });
                         }
                     });
@@ -177,12 +186,21 @@ define([
             }));
 
             on(dom.byId('saveButton'), "click", lang.hitch(this, function (e) {
-                if (!dom.byId("markupSelect").value) {
-                    alert("Please provide markup");
-                    return;
+                if (this.speciesRangeEcoshapes.length != 0) {
+                    if (!dom.byId("markupSelect").value && !dom.byId("usage_type_select").value) {
+                        alert("Please provide Presence or Usage Type markup");
+                        return;
+                    }
                 }
+                else {
+                    if (!dom.byId("markupSelect").value) {
+                        alert("Please provide Presence markup");
+                        return;
+                    }
+                }
+
                 if (!dom.byId("comment").value) {
-                    alert("Please provide markup comments");
+                    alert("Please provide markup comment");
                     return;
                 }
 
@@ -192,10 +210,14 @@ define([
                     reviewid: this.dataModel.reviewID,
                     ecoshapereviewnotes: dom.byId("comment").value,
                     username: this.userCredentials.userId,
-                    markup: dom.byId("markupSelect").value,
                     removalreason: null,
                     reference: dom.byId("reference").value
                 };
+
+                if (dom.byId("markupSelect").value) attributes.markup = dom.byId("markupSelect").value;
+                else attributes.markup = null;
+                if (dom.byId("usage_type_select").value) attributes.usagetypemarkup = dom.byId("usage_type_select").value;
+                else attributes.usagetypemarkup = null;
 
                 let removalReason = dom.byId("removalReason");
                 if (dom.byId("markupSelect").value === 'R') {
@@ -207,30 +229,66 @@ define([
                     }
                 }
 
-                let ecoshapeIDs = [], reviewedEcoshapeIDs = [], rangeMapEcoshapeIDs = [];
+                let ecoshapeIDs = [], reviewedEcoshapeIDs = [], rangeMapEcoshapeIDs = [], usageTypeEcoshapeIDs = [];
                 this.selectedFeatures.forEach(x => ecoshapeIDs.push(x.ecoshapeid));
                 this.reviewedEcoshapes.forEach(x => reviewedEcoshapeIDs.push(x.ecoshapeid));
                 this.speciesRangeEcoshapes.forEach(x => rangeMapEcoshapeIDs.push(x.ecoshapeid));
+                this.usageType.forEach(x => usageTypeEcoshapeIDs.push(x.ecoshapeid));
 
                 let editResponses = [];
                 if (this.reviewedEcoshapes.length != 0) {
                     let graphicObjs = [];
                     for (let i = 0; i < this.reviewedEcoshapes.length; i++) {
-                        if (dom.byId("markupSelect").value === 'R' &&
+                        let temp = JSON.parse(JSON.stringify(attributes));
+
+                        if (temp.markup === 'R' &&
                             rangeMapEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0)
                             continue;
+
+                        if (temp.markup === this.reviewedEcoshapes[i].markup) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
 
                         let flag = false;
                         for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
                             if (this.reviewedEcoshapes[i].ecoshapeid === this.speciesRangeEcoshapes[j].ecoshapeid &&
-                                dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                temp.markup === this.speciesRangeEcoshapes[j].presence) {
                                 flag = true;
                                 break;
                             }
                         }
-                        if (flag) continue;
+                        if (flag) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
 
-                        let temp = JSON.parse(JSON.stringify(attributes));
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
+
+                        if (temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
+                        flag = false;
+                        for (let j = 0; j < this.usageType.length; j++) {
+                            if (this.reviewedEcoshapes[i].ecoshapeid === this.usageType[j].ecoshapeid &&
+                                temp.usagetypemarkup === this.usageType[j].usagetype) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
+                        if (!temp.markup) delete temp.markup;
+                        if (!temp.usagetypemarkup) delete temp.usagetypemarkup;
                         temp.objectid = this.reviewedEcoshapes[i].objectid;
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
@@ -241,21 +299,44 @@ define([
                 if (insertecoshapeIDs.length != 0) {
                     let graphicObjs = [];
                     for (let i = 0; i < insertecoshapeIDs.length; i++) {
-                        if (dom.byId("markupSelect").value === 'R' &&
+                        let temp = JSON.parse(JSON.stringify(attributes));
+
+                        if ((temp.markup === 'R' || !temp.markup) &&
                             rangeMapEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0)
                             continue;
 
                         let flag = false;
                         for (let j = 0; j < this.speciesRangeEcoshapes.length; j++) {
                             if (insertecoshapeIDs[i] === this.speciesRangeEcoshapes[j].ecoshapeid &&
-                                dom.byId("markupSelect").value === this.speciesRangeEcoshapes[j].presence) {
+                                temp.markup === this.speciesRangeEcoshapes[j].presence) {
                                 flag = true;
                                 break;
                             }
                         }
-                        if (flag) continue;
+                        if (flag) {
+                            if (temp.usagetypemarkup) temp.markup = null;
+                            else continue;
+                        }
 
-                        let temp = JSON.parse(JSON.stringify(attributes));
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
+
+                        flag = false;
+                        for (let j = 0; j < this.usageType.length; j++) {
+                            if (insertecoshapeIDs[i] === this.usageType[j].ecoshapeid &&
+                                temp.usagetypemarkup === this.usageType[j].usagetype) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            if (temp.markup) temp.usagetypemarkup = null;
+                            else continue;
+                        }
+
                         temp.ecoshapeid = insertecoshapeIDs[i];
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
@@ -264,6 +345,7 @@ define([
 
                 all(editResponses).then(lang.hitch(this, function (results) {
                     helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
+                    helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                     helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
                 }));
 
@@ -327,10 +409,15 @@ define([
                                 speciesRangeEcoshapes: helper.fetchReviewedEcoshapes(
                                     this.config.layers.SPECIES_RANGE_ECOSHAPES.URL,
                                     "ecoshapeid in (" + ecoshapeIDs.toString() + ") and rangemapid=" + this.dataModel.rangeMapID
-                                )
+                                ),
+                                usageType: helper.fetchReviewedEcoshapes(
+                                    this.config.layers.USAGE_TYPE.URL,
+                                    "ecoshapeid in (" + ecoshapeIDs.toString() + ") and rangemapid=" + this.dataModel.rangeMapID
+                                ),
                             }).then(lang.hitch(this, function (results) {
                                 this.reviewedEcoshapes = results.reviewedEcoshapes;
                                 this.speciesRangeEcoshapes = results.speciesRangeEcoshapes;
+                                this.usageType = results.usageType.filter(x => x.usagetype);
 
                                 dom.byId("deleteMarkupSpan").style.display = "none";
                                 if (this.reviewedEcoshapes.length != 0) {
@@ -338,9 +425,12 @@ define([
                                 }
 
                                 dom.byId("infoPanel").style.display = "none";
+                                dom.byId("overallFeedbackDiv").style.display = "none";
                                 dom.byId("markup_info_pane").style.display = "none";
                                 dom.byId("no_info_pane").style.display = "none";
 
+                                dom.byId("markupSelect").value = "";
+                                dom.byId("usage_type_select").value = "";
                                 dom.byId("comment").value = "";
                                 dom.byId("reference").value = "";
 
@@ -353,6 +443,7 @@ define([
                                         this.selectedFeatures[0],
                                         this.speciesRangeEcoshapes,
                                         this.rangeMetadata.innerHTML,
+                                        this.usageType,
                                     );
                                 }
                                 else {
@@ -363,6 +454,8 @@ define([
                                     this.selectedFeatures,
                                     this.speciesRangeEcoshapes,
                                     this.reviewedEcoshapes,
+                                    this.usageType,
+                                    this.dataModel.differentiateusagetype
                                 );
 
                                 dom.byId("markupPanel").style.display = "block";
@@ -377,6 +470,20 @@ define([
                     }));
                 }
             }));
+        },
+
+        onOpen: function () {
+            var panel = this.getPanel();
+            panel.position.width = 325;
+            // panel.position.height = 300;
+            panel._originalBox = {
+                w: panel.position.width,
+                h: panel.position.height,
+                l: panel.position.left || 0,
+                t: panel.position.top || 0
+            };
+            panel.setPosition(panel.position);
+            panel.panelManager.normalizePanel(panel);
         },
 
         onSignIn: function (credential) {

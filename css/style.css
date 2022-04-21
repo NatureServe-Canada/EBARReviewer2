@@ -1,13 +1,124 @@
 .jimu-widget-reviewerwidget>* {
-    margin-bottom: 10px;
+    /* margin-bottom: 300px; */
+    font-size: 1.15em;
+}
+
+.jimu-widget-reviewerwidget option, button, textarea {
+    font-size: 1.15em;
+}
+
+.jimu-widget-reviewerwidget strong {
+    color: #B80F0A;
+}
+
+.jimu-widget-reviewerwidget .panel_heading {
+    font-weight: 600;
+    font-size: 1.4em;
+    margin-top: 0em;
+    margin-bottom: 0.2em;
+}
+
+.jimu-widget-reviewerwidget div {
+    margin-bottom: .4em;
 }
 
 .jimu-widget-reviewerwidget label {
     display: inline-block;
-    min-width: 80px;
-    margin-right: 10px;
+    /* min-width: 80px; */
+    /* margin-right: 10px; */
 }
 
-.jimu-widget-reviewerwidget .dijitSelect {
-    width: 250px;
-  }
+.jimu-widget-reviewerwidget select {
+    width: 100%;
+    height: 2.5em;
+    margin-top: 0.4em;
+    margin-bottom: 0.4em;
+}
+
+.jimu-widget-reviewerwidget textarea {
+    width: 100%;
+    height: 3.5em;
+    font-family: inherit;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group {
+    /* remove inline-block whitespace */
+    font-size: 0;
+    /* flip the order so we can use the + and ~ combinators */
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    /* the hidden clearer */
+}
+
+.jimu-widget-reviewerwidget .star-cb-group * {
+    font-size: 1.5rem;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>input {
+    display: none;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>input+label {
+    /* only enough room for the star */
+    display: inline-block;
+    overflow: hidden;
+    text-indent: 9999px;
+    width: 1em;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>input+label:before {
+    display: inline-block;
+    text-indent: -9999px;
+    content: "☆";
+    color: #888;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>input:checked~label:before, .jimu-widget-reviewerwidget .star-cb-group>input+label:hover~label:before, .jimu-widget-reviewerwidget .star-cb-group>input+label:hover:before {
+    content: "★";
+    color: rgb(250, 216, 23);
+    text-shadow: 0 0 1px #333;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>.star-cb-clear+label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group>.star-cb-clear+label:before {
+    width: .5em;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group:hover>input+label:before {
+    content: "☆";
+    color: #888;
+    text-shadow: none;
+}
+
+.jimu-widget-reviewerwidget .star-cb-group:hover>input+label:hover~label:before, .jimu-widget-reviewerwidget .star-cb-group:hover>input+label:hover:before {
+    content: "★";
+    color: rgb(250, 216, 23);
+    text-shadow: 0 0 1px #333;
+}
+
+.jimu-widget-reviewerwidget button {
+    background-color: #4c7235 ;
+    border: 1px solid #4c7235 ;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
+    box-sizing: border-box;
+    color: #fff;
+    padding: 5px 10px;
+    text-align: center;
+    font-weight: 400;
+    transform: translateY(0);
+    transition: transform 150ms, box-shadow 150ms;
+    font-size: 1.1em;
+}
+
+.jimu-widget-reviewerwidget button:hover {
+    box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
+    transform: translateY(-2px);
+}
