@@ -455,7 +455,8 @@ define([
                                     this.speciesRangeEcoshapes,
                                     this.reviewedEcoshapes,
                                     this.usageType,
-                                    this.dataModel.differentiateusagetype
+                                    this.dataModel.differentiateusagetype,
+                                    this.nls
                                 );
 
                                 dom.byId("markupPanel").style.display = "block";

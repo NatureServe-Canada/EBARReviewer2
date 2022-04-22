@@ -7,81 +7,78 @@
             <select id="speciesSelect" disabled></select>
         </div>
         <div style="display: none;" class="review_submitted">
-            <span><strong>REVIEW SUBMITTED:</strong> Additional markup and feedback for this range map are not
-                allowed.</span>
+            <span><strong>${nls.review_submitted}:</strong> ${nls.reviewSubmitted}</span>
         </div>
         <div>
-            <span><b>Range Version:</b></span>
+            <span><b>${nls.rangeVersion}:</b></span>
             <span data-dojo-attach-point='rangeVersion'></span>
         </div>
         <div>
-            <span><b>Stage:</b></span>
+            <span><b>${nls.rangeStage}:</b></span>
             <span data-dojo-attach-point='rangeStage'></span>
         </div>
         <div>
-            <span><b>Range Map Scope:</b></span>
+            <span><b>${nls.rangeScope}:</b></span>
             <span data-dojo-attach-point='rangeScope'></span>
         </div>
         <div>
-            <span><b>Species Information:</b></span>
+            <span><b>${nls.speciesInformation}:</b></span>
             <span data-dojo-attach-point='speciesInformation'></span>
         </div>
         <div>
-            <span><b>Metadata:</b></span>
+            <span><b>${nls.metadata}:</b></span>
             <span data-dojo-attach-point='rangeMetadata'></span>
         </div>
         <div><span data-dojo-attach-point='rangeMapNotes'></span></div><br>
 
-        <button class="esri-button" id="overallFeedbackButton" disabled>Overall Feedback</button>
+        <button class="esri-button" id="overallFeedbackButton" disabled>${nls.overallFeedback}</button>
     </div>
     <div id="markupPanel" style="display: none">
         <div>
             <div id="markup_info_pane">
-                <p class="panel_heading">Ecoshape: <span id="ecoshapeName"></span></p>
+                <p class="panel_heading">${nls.ecoshapeName}: <span id="ecoshapeName"></span></p>
                 <hr>
                 <div style="display: none;" class="review_submitted">
-                    <span><strong>REVIEW SUBMITTED:</strong> Additional markup for this range map is not
-                        allowed.</span>
+                    <span><strong>${nls.review_submitted}:</strong> ${nls.reviewSubmitted}</span>
                 </div>
                 <div>
-                    <span><b>Parent Ecoregion:</b></span>
+                    <span><b>${nls.parentEcoregion}:</b></span>
                     <span id='parentEcoregion'></span>
                 </div>
                 <div>
-                    <span><b>Ecozone:</b></span>
+                    <span><b>${nls.ecozone}:</b></span>
                     <span id='ecozone'></span>
                 </div>
                 <div>
-                    <span><b>Terrestrial Area:</b></span>
+                    <span><b>${nls.terrestrialArea}:</b></span>
                     <span id='terrestrialArea'></span>
                 </div>
                 <div>
-                    <span><b>Terrestrial Proportion:</b></span>
+                    <span><b>${nls.terrestrialProportion}:</b></span>
                     <span id='terrestrialProportion'></span>
                 </div>
                 <div>
-                    <span><b>Presence:</b></span>
+                    <span><b>${nls.presence}:</b></span>
                     <span id='ecoshapePresence'></span>
                 </div>
                 <div>
-                    <span><b>Usage Type:</b></span>
+                    <span><b>${nls.usageType}:</b></span>
                     <span id='ecoshapeUsageType'></span>
                 </div>
                 <div>
-                    <span><b>Species:</b></span>
+                    <span><b>${nls.ecoshapeSpecies}:</b></span>
                     <span id='ecoshapeSpecies'></span>
                 </div>
                 <div>
-                    <span><b>Metadata:</b></span>
+                    <span><b>${nls.metadata}:</b></span>
                     <span id='ecoshapeMetadata'></span>
                 </div>
             </div>
             <div id="no_info_pane">
-                <p class="panel_heading">Multiple Ecoshapes selected</p>
+                <p class="panel_heading">${nls.multipleEcoshapes}</p>
                 <hr>
                 <div style="display: none;" class="review_submitted">
-                    <span><strong>REVIEW SUBMITTED:</strong> Additional markup for this range map is not
-                        allowed.</span>
+                    <span><strong>${nls.review_submitted}:</strong> ${nls.reviewSubmitted}</span>
                 </div>
                 <div id="markup_warnings">
                     <p><strong>WARNING:</strong> Existing markup for the selected Ecoshapes will be replaced on save.</p>
@@ -93,57 +90,55 @@
         <br>
         <div id="markup_form">
             <div>
-                <span><b>Presence Markup<span id="markup_required_annotation"> (required)</span>:</b></span>
+                <span><b>${nls.presence} ${nls.markup}<span id="markup_required_annotation"> (${nls.required})</span>:</b></span>
                 <select id="markupSelect" required>
-                    <option disabled="" selected="" value="">None set</option>
+                    <option disabled="" selected="" value="">${nls.noneSet}</option>
                 </select>
             </div>
             <div id="usage_type_div" style="display:none">
-                <span><b>Usage Type Markup:</b></span>
+                <span><b>${nls.usageType} ${nls.markup}:</b></span>
                 <select id="usage_type_select" required>
-                    <option disabled="" selected="" value="">None set</option>
+                    <option disabled="" selected="" value="">${nls.noneSet}</option>
                 </select>
             </div>
             <div id='removalReasonDiv' style="display:none">
                 <div>
-                    <label for="removalReason"><b>Removal Reason (required):</b></label><br>
+                    <label for="removalReason"><b>${nls.removalReason} (${nls.required}):</b></label><br>
                     <select id="removalReason">
-                        <option disabled="" selected="" value="">None set</option>
-                        <option value="X">Presumed Extirpated</option>
-                        <option value="N">Never Was There</option>
-                        <option value="F">Reported But False</option>
-                        <option value="T">Transient/Vagrant</option>
-                        <option value="O">Other</option>
+                        <option disabled="" selected="" value="">${nls.noneSet}</option>
+                        <option value="X">${nls.removalReason1}</option>
+                        <option value="N">${nls.removalReason2}</option>
+                        <option value="F">${nls.removalReason3}</option>
+                        <option value="T">${nls.removalReason4}</option>
+                        <option value="O">${nls.removalReason5}</option>
                     </select>
                 </div>
             </div>
             <div>
-                <label for="comment"><b>Comment (required):</b></label><br>
+                <label for="comment"><b>${nls.comment} (${nls.required}):</b></label><br>
                 <textarea id="comment" name="comment" rows="4" cols="30"></textarea>
             </div>
             <div>
-                <label for="reference"><b>Reference:</b></label><br>
+                <label for="reference"><b>${nls.reference}:</b></label><br>
                 <textarea id="reference" name="reference" rows="4" cols="30"></textarea>
             </div>
             <br>
             <div>
                 <span>
-                    <button class="esri-button" id="backButton">Back</button>
+                    <button class="esri-button" id="backButton">${nls.back}</button>
                     <span id="deleteMarkupSpan" style="display:none"><button class="esri-button"
-                            id="deleteMarkup">Delete
-                            Markup</button></span>
-                    <button class="esri-button" id="saveButton">Save</button>
+                            id="deleteMarkup">${nls.delete}</button></span>
+                    <button class="esri-button" id="saveButton">${nls.save}</button>
                 </span>
             </div>
         </div>
     </div>
     <div id="overallFeedbackDiv" style="display:none">
         <div id="overallFeedback">
-            <p class="panel_heading">Overall range feedback</p>
+            <p class="panel_heading">${nls.provideFeedBack}</p>
             <hr>
             <div style="display: none;" class="review_submitted">
-                <span><strong>REVIEW SUBMITTED:</strong> Additional feedback for this range map is not
-                    allowed.</span>
+                <span><strong>${nls.review_submitted}:</strong> ${nls.reviewSubmitted}</span>
             </div>
             <div>
                 <fieldset>
@@ -164,15 +159,15 @@
                 </fieldset>
             </div>
             <div>
-                <label for="overallComment"><b>Overall comment:</b></label><br>
+                <label for="overallComment"><b>${nls.overallComment}:</b></label><br>
                 <textarea id="overallComment" name="overallComment" rows="4" cols="30"></textarea>
             </div>
         </div><br>
         <div>
             <span>
-                <button class="esri-button" id="closeOverallFeedbackButton">Back</button>
-                <button class="esri-button" id="SaveOverallFeedbackButton">Save</button>
-                <button class="esri-button" id="SubmitOverallFeedbackButton">Submit</button>
+                <button class="esri-button" id="closeOverallFeedbackButton">${nls.back}</button>
+                <button class="esri-button" id="SaveOverallFeedbackButton">${nls.save}</button>
+                <button class="esri-button" id="SubmitOverallFeedbackButton">${nls.Submit}</button>
             </span>
         </div>
     </div>

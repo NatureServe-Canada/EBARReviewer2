@@ -21,7 +21,7 @@ define([
             return queryTask.execute(queryParams, method, this._onSearchError);
         },
 
-        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes, usageType, differentiateusagetype) {
+        setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes, usageType, differentiateusagetype, nls) {
             dom.byId("markup_warning").style.display = "none";
 
             if (differentiateusagetype === 1) {
@@ -44,14 +44,14 @@ define([
 
 
             let markupSelectObj = dom.byId("markupSelect");
-            let pDict = { P: "Present", X: "Presence Expected", H: "Historical", R: "Remove" };
+            let pDict = { P: nls.present, X: nls.presenceExpected, H: nls.historical, R: nls.remove };
             while (markupSelectObj.lastChild) {
                 if (!markupSelectObj.lastChild.value) break;
                 markupSelectObj.removeChild(markupSelectObj.lastChild);
             }
 
             let usageTypeSelect = dom.byId("usage_type_select");
-            let uDict = { B: "Breeding", P: "Possible Breeding", M: "Migration", N: "Non-breeding" }
+            let uDict = { B: nls.breeding, P: nls.possibleBreeding, M: nls.migration, N: nls.nonBreeding }
             while (usageTypeSelect.lastChild) {
                 if (!usageTypeSelect.lastChild.value) break;
                 usageTypeSelect.removeChild(usageTypeSelect.lastChild);
@@ -194,7 +194,7 @@ define([
 
             let taxaSelect = dom.byId("taxaSelect");
             domConstruct.create("option", {
-                innerHTML: "Select Taxa",
+                innerHTML: this.nls.selectTaxa,
                 selected: "",
                 disabled: "",
                 value: ""
@@ -208,7 +208,7 @@ define([
 
             let speciesSelect = dom.byId("speciesSelect");
             domConstruct.create("option", {
-                innerHTML: "Select Species",
+                innerHTML: this.nls.selectSpecies,
                 selected: "",
                 disabled: "",
                 value: ""
@@ -250,7 +250,7 @@ define([
                         this.rangeScope.innerHTML = featureAttributes['rangemapscope'] == 'G' ? 'Global' : featureAttributes['rangemapscope'] == 'N' ? 'National' : '';
                         this.rangeMetadata.innerHTML = featureAttributes['rangemetadata'];
                         this.rangeMapNotes.innerHTML = featureAttributes['rangemapnotes'];
-                        this.speciesInformation.innerHTML = '<a href=' + featureAttributes['nsx_url'] + ' target="_blank" rel="noopener noreferrer">go to NatureServe Explorer</a>';
+                        this.speciesInformation.innerHTML = '<a href=' + featureAttributes['nsx_url'] + ' target="_blank" rel="noopener noreferrer">' + this.nls.gotoNSExplorer + '</a>';
 
                         rangeMapID = featureAttributes['rangemapid'];
                         reviewID = featureAttributes['reviewid'];
