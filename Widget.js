@@ -288,7 +288,8 @@ define([
                         }
 
                         if (!temp.markup) delete temp.markup;
-                        if (!temp.usagetypemarkup) delete temp.usagetypemarkup;
+                        if (temp.markup != 'R' && !temp.usagetypemarkup) delete temp.usagetypemarkup;
+                        else if (temp.markup == 'R') temp.usagetypemarkup = null;
                         temp.objectid = this.reviewedEcoshapes[i].objectid;
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
