@@ -22,7 +22,7 @@ define([
         },
 
         setMarkupOptions: function (selectedFeatures, speciesRangeEcoshapes, reviewedEcoshapes, usageType, differentiateusagetype, nls) {
-            dom.byId("markup_warning").style.display = "none";
+            // dom.byId("markup_warning").style.display = "none";
 
             if (differentiateusagetype === 1) {
                 dom.byId("usage_type_div").style.display = "block";
@@ -99,11 +99,11 @@ define([
                 let optionToSkip = null;
                 if (speciesRangeEcoshapes.length != 0) {
                     isRangePresent = true;
-                    dom.byId("markup_warning").style.display = "block";
+                    // dom.byId("markup_warning").style.display = "block";
                     if (speciesRangeEcoshapes.length == selectedFeatures.length) {
                         let temp = speciesRangeEcoshapes.map(x => x.presence);
                         if (temp.every(v => v === temp[0])) optionToSkip = temp[0];
-                        dom.byId("markup_warning").style.display = "none";
+                        // dom.byId("markup_warning").style.display = "none";
                     }
                 }
                 for (let key in pDict) {

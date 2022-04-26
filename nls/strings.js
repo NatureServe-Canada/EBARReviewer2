@@ -19,7 +19,7 @@
         ecoshapeSpecies: "Species",
         multipleEcoshapes: "Multiple Ecoshapes selected",
         warning: "WARNING",
-        warning1: "Existing markup for the selected Ecoshapes will be replaced on save",
+        warning1: "Existing markup, including comments and references, for the selected Ecoshapes will be replaced on save",
         warning2: "Chosen markup will only be applied to relevant Ecoshapes",
         required: "required",
         markup: "Markup",
@@ -48,7 +48,8 @@
         breeding: "Breeding",
         possibleBreeding: "Possible Breeding",
         migration: "Migration",
-        nonBreeding: "Non-breeding"
+        nonBreeding: "Non-breeding",
+        _widgetLabel: "EBAR Reviewer"
     }),
     "fr": 1
 });

@@ -18,7 +18,7 @@ define({
     ecoshapeSpecies: "Espèce",
     multipleEcoshapes: "Plusieurs éco-formes sélectionnées",
     warning: "AVERTISSEMENT",
-    warning1: "Le balisage existant pour les Ecoshapes sélectionnés sera remplacé lors de la sauvegarde",
+    warning1: "Le balisage existant, y compris les commentaires et les références, pour les Écoshapes sélectionnés sera remplacé lors de la sauvegarde",
     warning2: "Le balisage choisi ne sera appliqué qu'aux Écoshapes pertinents",
     required: "obligatoire",
     markup: "Balisage",
@@ -32,7 +32,7 @@ define({
     comment: "Commentaire",
     reference: "Référence",
     back: "Précédent",
-    delete: "Supprimer le balisage",
+    delete: "Supprimer",
     save: "Savez",
     Submit: "Soumit",
     provideFeedBack: "Rétroaction sur la gamme globale",
@@ -47,5 +47,6 @@ define({
     breeding: "Élevage",
     possibleBreeding: "Reproduction possible",
     migration: "Migration",
-    nonBreeding: "Non-reproduction"
+    nonBreeding: "Non-reproduction",
+    _widgetLabel: "Reviseur CAARBE"
 });
