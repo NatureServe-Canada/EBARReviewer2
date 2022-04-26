@@ -193,7 +193,7 @@ define([
                     }
                 }
                 else {
-                    if (!dom.byId("markupSelect").value) {
+                    if (!dom.byId("markupSelect").value && this.reviewedEcoshapes.length == 0) {
                         alert("Please provide Presence markup");
                         return;
                     }

@@ -36,6 +36,7 @@ define([
                         dom.byId("usage_type_select").disabled = true;
                     }
                     else {
+                        dom.byId("markup_required_annotation").style.display = "none";
                         dom.byId("usage_type_select").disabled = false;
                     }
                 }
