@@ -13,15 +13,12 @@
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10"
         },
         "REVIEW_RANGEMAP_SPECIES": {
-            "title": "ReviewerApp2 - ReviewRangeMapSpecies",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12"
         },
         "ECOSHAPE_REVIEW": {
-            "title": "ReviewerApp2 - EcoshapeReview",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3"
         },
         "REVIEW": {
-            "title": "ReviewerApp2 - Review",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp/FeatureServer/4"
         },
         "USAGE_TYPE": {
@@ -31,6 +28,9 @@
         "USAGE_TYPE_MARKUP": {
             "title": "Usage Type Markup",
             "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/14"
+        },
+        "SPECIES_RANGE_INPUTS": {
+            "title": "Species Range Non-restricted Inputs"
         }
     }
 }

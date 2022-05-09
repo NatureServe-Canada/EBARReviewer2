@@ -274,7 +274,7 @@ define([
                         layerNode.setFilter("reviewid=" + reviewID + " and markup is not null");
                         promise = layerNode.getExtent();
                     }
-                    else if (layerNode.title === "Species Range Input") {
+                    else if (layerNode.title === this.config.layers.SPECIES_RANGE_INPUTS.title) {
                         layerNode.setFilter("rangemapid=" + rangeMapID);
                     }
                     else if (layerNode.title === this.config.layers.USAGE_TYPE.title) {
