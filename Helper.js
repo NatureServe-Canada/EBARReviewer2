@@ -9,8 +9,8 @@ define([
     'jimu/LayerStructure',
     'esri/layers/FeatureLayer',
     'esri/graphic',
-    'dojo/promise/all',
-], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure, FeatureLayer, graphic, all) {
+    'jimu/SelectionManager'
+], function (lang, declare, dom, on, domConstruct, Query, QueryTask, LayerStructure, FeatureLayer, graphic, SelectionManager) {
     return declare(null, {
         queryLayer: function (url, where, outFields, method = null) {
             var queryParams = new Query();
@@ -386,7 +386,8 @@ define([
             let layerStructure = LayerStructure.getInstance();
             layerStructure.traversal(function (layerNode) {
                 if (layerNode.title === layerTitle)
-                    layerNode.getLayerObject().then((layer) => layer.clearSelection());
+                    // layerNode.getLayerObject().then((layer) => layer.clearSelection());
+                    layerNode.getLayerObject().then((layer) => SelectionManager.getInstance().clearSelection(layer));
             });
         },
 
