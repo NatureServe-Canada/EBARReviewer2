@@ -53,6 +53,7 @@ define([
             });
 
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
+                if (!confirm("After submit, additional markup and feedback for this range map will not be allowed. Do you want to continue?")) return;
                 let reviewLayer = new FeatureLayer(this.config.layers.REVIEW.URL);
 
                 let radioButtons = document.getElementsByName("rating");
