@@ -40,17 +40,27 @@ define([
 
             this.dataModel = new DataModel();
 
-            on(dom.byId("markupSelect"), "change", function () {
+            on(dom.byId("markupSelect"), "change", lang.hitch(this, function () {
                 let removalReasonDiv = dom.byId("removalReasonDiv");
+                // if (dom.byId("markupSelect").value === 'R') {
+                //     removalReasonDiv.style.display = "block";
+                //     dom.byId("usage_type_select").value = "";
+                //     dom.byId("usage_type_select").disabled = true;
+                // }
                 if (dom.byId("markupSelect").value === 'R') {
                     removalReasonDiv.style.display = "block";
+                    dom.byId("usage_type_select").value = "";
+                    dom.byId("usage_type_select").disabled = true;
+                }
+                else if (dom.byId("markupSelect").value === '' && this.speciesRangeEcoshapes.length === 0) {
+                    dom.byId("usage_type_select").value = "";
                     dom.byId("usage_type_select").disabled = true;
                 }
                 else {
                     removalReasonDiv.style.display = "none";
                     dom.byId("usage_type_select").disabled = false;
                 }
-            });
+            }));
 
             on(dom.byId("SubmitOverallFeedbackButton"), "click", lang.hitch(this, function (e) {
                 if (!confirm("After submit, additional markup and feedback for this range map will not be allowed. Do you want to continue?")) return;
@@ -194,10 +204,11 @@ define([
                     }
                 }
                 else {
-                    if (!dom.byId("markupSelect").value && this.reviewedEcoshapes.length == 0) {
+                    if (!dom.byId("markupSelect").value) {
                         alert("Please provide Presence markup");
                         return;
                     }
+
                 }
 
                 if (!dom.byId("comment").value) {
@@ -288,8 +299,8 @@ define([
                             else continue;
                         }
 
-                        if (!temp.markup) delete temp.markup;
-                        if (temp.markup != 'R' && !temp.usagetypemarkup) delete temp.usagetypemarkup;
+                        if (temp.markup == '') temp.markup = null;
+                        if (temp.markup != 'R' && temp.usagetypemarkup == '') temp.usagetypemarkup = null;
                         else if (temp.markup == 'R') temp.usagetypemarkup = null;
                         temp.objectid = this.reviewedEcoshapes[i].objectid;
                         graphicObjs.push(new graphic().setAttributes(temp));
