@@ -52,7 +52,7 @@ define([
             }
 
             let usageTypeSelect = dom.byId("usage_type_select");
-            let uDict = { B: nls.breeding, P: nls.possibleBreeding, M: nls.migration, N: nls.nonBreeding }
+            let uDict = { B: nls.breeding, P: nls.possibleBreeding}
             while (usageTypeSelect.lastChild) {
                 if (!usageTypeSelect.lastChild.value) break;
                 usageTypeSelect.removeChild(usageTypeSelect.lastChild);
