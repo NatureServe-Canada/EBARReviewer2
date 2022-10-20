@@ -275,11 +275,11 @@ define([
                             else continue;
                         }
 
-                        if ((temp.usagetypemarkup === 'N') &&
-                            usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
-                            if (!temp.markup) continue;
-                            else temp.usagetypemarkup = null;
-                        }
+                        // if ((temp.usagetypemarkup === 'N') &&
+                        //     usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
+                        //     if (!temp.markup) continue;
+                        //     else temp.usagetypemarkup = null;
+                        // }
 
                         // if (temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
                         //     if (temp.markup) temp.usagetypemarkup = null;
@@ -299,9 +299,12 @@ define([
                             else continue;
                         }
 
-                        if (temp.markup == '') temp.markup = null;
-                        if (temp.markup != 'R' && temp.usagetypemarkup == '') temp.usagetypemarkup = null;
-                        else if (temp.markup == 'R') temp.usagetypemarkup = null;
+                        if (!temp.markup) {
+                            temp.markup = null;
+                            if (!rangeMapEcoshapeIDs.includes(this.reviewedEcoshapes[i].ecoshapeid))
+                                temp.usagetypemarkup = null;
+                        }
+                        if ((temp.markup == 'R') || (temp.markup != 'R' && temp.usagetypemarkup == '')) temp.usagetypemarkup = null;
                         temp.objectid = this.reviewedEcoshapes[i].objectid;
                         graphicObjs.push(new graphic().setAttributes(temp));
                     }
@@ -331,11 +334,11 @@ define([
                             else continue;
                         }
 
-                        if ((temp.usagetypemarkup === 'N') &&
-                            usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
-                            if (!temp.markup) continue;
-                            else temp.usagetypemarkup = null;
-                        }
+                        // if ((temp.usagetypemarkup === 'N') &&
+                        //     usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
+                        //     if (!temp.markup) continue;
+                        //     else temp.usagetypemarkup = null;
+                        // }
 
                         flag = false;
                         for (let j = 0; j < this.usageType.length; j++) {

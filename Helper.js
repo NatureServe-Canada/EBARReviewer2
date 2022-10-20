@@ -72,7 +72,7 @@ define([
                 let usageTypeVal = usageType.length != 0 ? usageType[0].usagetype : null;
                 for (let key in uDict) {
                     if (usageTypeVal && usageTypeVal === key) continue;
-                    if (!usageTypeVal && key === "N") continue;
+                    // if (!usageTypeVal && key === "N") continue;
                     domConstruct.create("option", {
                         innerHTML: uDict[key],
                         value: key
