@@ -137,7 +137,7 @@ define([
             }
         },
 
-        setEcoshapeInfo: function (feature, speciesRangeEcoshapes, ecoshapeMetadata, usageType) {
+        setEcoshapeInfo: function (feature, speciesRangeEcoshapes, usageType) {
             dom.byId("parentEcoregion").innerHTML = feature.parentecoregion;
             dom.byId("ecozone").innerHTML = feature.ecozone;
             dom.byId("terrestrialArea").innerHTML = `${Math.round((feature.terrestrialarea / 1000000) * 100) / 100} km<sup>2</sup>`;
@@ -147,7 +147,7 @@ define([
             if (speciesRangeEcoshapes.length != 0) {
                 let presence = speciesRangeEcoshapes[0].presence;
                 dom.byId("ecoshapePresence").innerHTML = presence === "P" ? "Present" : presence === "H" ? "Historical" : "Presence Expected";
-                dom.byId("ecoshapeMetadata").innerHTML = ecoshapeMetadata;
+                dom.byId("ecoshapeMetadata").innerHTML = speciesRangeEcoshapes[0].rangemapecoshapenotes;
             }
             else {
                 dom.byId("ecoshapePresence").innerHTML = "";

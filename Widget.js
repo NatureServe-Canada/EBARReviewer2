@@ -458,7 +458,6 @@ define([
                                     helper.setEcoshapeInfo(
                                         this.selectedFeatures[0],
                                         this.speciesRangeEcoshapes,
-                                        this.rangeMetadata.innerHTML,
                                         this.usageType,
                                     );
                                 }
