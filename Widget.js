@@ -100,6 +100,9 @@ define([
                     dom.byId("SaveOverallFeedbackButton").disabled = true;
                     dom.byId("SubmitOverallFeedbackButton").disabled = true;
                     dom.byId("deleteMarkup").disabled = true;
+                }, (err) => {
+                    console.log(err);
+                    alert('Error submitting overall feedback. Please contact the support team.');
                 });
             }));
 
@@ -132,6 +135,9 @@ define([
                         console.log("Overall Feedback Comment posted");
                         dom.byId("overallFeedbackDiv").style.display = "none";
                         dom.byId("infoPanel").style.display = "block";
+                    }, (err) => {
+                        console.log(err);
+                        alert('Error saving overall feedback. Please contact the support team.');
                     });
                 }
             }));
@@ -191,6 +197,9 @@ define([
                                 helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                             });
                         }
+                    }, (err) => {
+                        console.log(err);
+                        alert('Error deleting markup. Please contact the support team.');
                     });
 
                 helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
@@ -275,11 +284,11 @@ define([
                             else continue;
                         }
 
-                        // if ((temp.usagetypemarkup === 'N') &&
-                        //     usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
-                        //     if (!temp.markup) continue;
-                        //     else temp.usagetypemarkup = null;
-                        // }
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(this.reviewedEcoshapes[i].ecoshapeid) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
 
                         // if (temp.usagetypemarkup === this.reviewedEcoshapes[i].usagetypemarkup) {
                         //     if (temp.markup) temp.usagetypemarkup = null;
@@ -334,11 +343,11 @@ define([
                             else continue;
                         }
 
-                        // if ((temp.usagetypemarkup === 'N') &&
-                        //     usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
-                        //     if (!temp.markup) continue;
-                        //     else temp.usagetypemarkup = null;
-                        // }
+                        if ((temp.usagetypemarkup === 'N') &&
+                            usageTypeEcoshapeIDs.indexOf(insertecoshapeIDs[i]) < 0) {
+                            if (!temp.markup) continue;
+                            else temp.usagetypemarkup = null;
+                        }
 
                         flag = false;
                         for (let j = 0; j < this.usageType.length; j++) {
@@ -363,7 +372,10 @@ define([
                     helper.refreshMapLayer(this.config.layers.REVIEWED_ECOSHAPES.title);
                     helper.refreshMapLayer(this.config.layers.USAGE_TYPE_MARKUP.title);
                     helper.clearSelectionByLayer(this.config.layers.ECOSHAPES.title);
-                }));
+                }), (err) => {
+                    console.log(err);
+                    alert('Error saving markup. Please contact the support team.');
+                });
 
             }));
 

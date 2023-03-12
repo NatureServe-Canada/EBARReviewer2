@@ -2,32 +2,32 @@
     "layers": {
         "ECOSHAPES": {
             "title": "Ecoshapes (generalized)",
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/6"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/6"
         },
         "REVIEWED_ECOSHAPES": {
             "title": "Presence Markup",
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/11"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/11"
         },
         "SPECIES_RANGE_ECOSHAPES": {
             "title": "Species Range Ecoshapes (generalized)",
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/10"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/10"
         },
         "REVIEW_RANGEMAP_SPECIES": {
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/12"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/12"
         },
         "ECOSHAPE_REVIEW": {
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/3"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/3"
         },
         "REVIEW": {
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp/FeatureServer/4"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/4"
         },
         "USAGE_TYPE": {
             "title": "Usage Type",
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/13"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/13"
         },
         "USAGE_TYPE_MARKUP": {
             "title": "Usage Type Markup",
-            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2/FeatureServer/14"
+            "URL": "https://gis.natureserve.ca/arcgis/rest/services/EBAR-KBA/ReviewerApp2C/FeatureServer/14"
         },
         "SPECIES_RANGE_INPUTS": {
             "title": "Species Range Non-restricted Inputs"

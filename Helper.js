@@ -52,7 +52,7 @@ define([
             }
 
             let usageTypeSelect = dom.byId("usage_type_select");
-            let uDict = { B: nls.breeding, P: nls.possibleBreeding}
+            let uDict = { B: nls.breeding, P: nls.possibleBreeding, N: nls.nonBreeding};
             while (usageTypeSelect.lastChild) {
                 if (!usageTypeSelect.lastChild.value) break;
                 usageTypeSelect.removeChild(usageTypeSelect.lastChild);
@@ -72,7 +72,7 @@ define([
                 let usageTypeVal = usageType.length != 0 ? usageType[0].usagetype : null;
                 for (let key in uDict) {
                     if (usageTypeVal && usageTypeVal === key) continue;
-                    // if (!usageTypeVal && key === "N") continue;
+                    if (!usageTypeVal && key === "N") continue;
                     domConstruct.create("option", {
                         innerHTML: uDict[key],
                         value: key
